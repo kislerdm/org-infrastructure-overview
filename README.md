@@ -38,12 +38,12 @@ nodes which belong to selected level's node and the linked nodes from other leve
 
 **GIVEN**
 
-- The organisation contains of two departments: _DepartmentA_ and _DepartmentB_.
+- The organisation _Foo_ contains of two departments: _DepartmentA_ and _DepartmentB_.
 - The _DepartmentA_ has two domains: _DomainA_ and _DomainB_.
 - The _DomainA_ consists of three teams: _Team0_ (backend), _Team1_ (frontend).
 - The _DomainB_ has one team: _Team2_ (analytics and reconciliation).
 - The _DepartmentB_ has two teams: _Team3_ (streaming platform) and _Team4_ (CIAM).
-- The _Team0_ has one outbound dependency: _Team1__, and two inbound dependencies: _Team3_ and _Team4_. 
+- The _Team0_ has one outbound dependency: _Team1_, and two inbound dependencies: _Team3_ and _Team4_. 
 - The _Team1_ has two inbound dependencies: _Team0_ and _Team4_.
 - The _Team2_ has one dependency: _Team3_.
 - The _Team3_ has three dependencies: _Team0_, _Team2_ and _Team4_.
@@ -52,7 +52,7 @@ nodes which belong to selected level's node and the linked nodes from other leve
 - The _Team1_ owns one service: _Service2_.
 - The _Team2_ owns one service: _Service3_.
 - The _Team3_ owns three services: _Service4_, _Service5_ and _Service6_.
-- The _Team3_ owns three services: _Service7_, _Service8_ and _Service9_.
+- The _Team4_ owns three services: _Service7_, _Service8_ and _Service9_.
 - _Service0_ consists of three containers:
   - _App1_: _Kotlin_ application deployed as AWS EKS;
   - _Database_: AWS Aurora Postgres.
@@ -60,7 +60,7 @@ nodes which belong to selected level's node and the linked nodes from other leve
 - _Service1_ is a _Kotlin_ application to run batch jobs on database.
 - _Service2_ is a _JavaScript_ application deployed to AWS EKS.
 - _Service3_ consists of two containers:
-  - _App_: _Python_ application deployed to AWS EKS;
+  - _App_: _Python_ analytics app deployed to AWS EKS;
   - _Database_: S3 bucket. 
 - _Service4_ consists of three containers:
   - _App1_: _Kafka_ deployed as AWS MSK; 
@@ -91,16 +91,18 @@ The following diagram is expected.
 ```mermaid 
 C4Context
 
-Enterprise_Boundary(departmentA, "DepartmentA") {
-    Enterprise_Boundary(domainA, "DomainA") {
-        Component(team0, "Team0")
-        Component(team1, "Team1")
-    }
-}
-
-Enterprise_Boundary(departmentB, "DepartmentB") {
-    Component_Ext(team3, "Team3")
-    Component_Ext(team4, "Team4")
+Enterprise_Boundary(foo, "Organisation Foo") {
+  Enterprise_Boundary(departmentA, "Department A") {
+      Enterprise_Boundary(domainA, "Domain A") {
+          Component(team0, "Team 0")
+          Component(team1, "Team 1")
+      }
+  }
+  
+  Enterprise_Boundary(departmentB, "Department B") {
+      Component_Ext(team3, "Team 3")
+      Component_Ext(team4, "Team 4")
+  }
 }
 
 Rel(team1, team0, "")
@@ -123,15 +125,15 @@ The following diagram is expected.
 ```mermaid
 C4Context
 
-Enterprise_Boundary(team1, "Team1") {
+Enterprise_Boundary(team1, "Team 1") {
     Container(team1.app, "WebClient", "JavaScript/AWS EKS")
 }
 
-Enterprise_Boundary(team0, "Team0") {
+Enterprise_Boundary(team0, "Team 0") {
     Container_Ext(team0.app, "Backend", "Kotlin/AWS EKS")
 }
 
-Enterprise_Boundary(team4, "Team4") {
+Enterprise_Boundary(team4, "Team 4") {
     Container_Ext(iam, "CIAM", "AWS Cognito")
 }
 
@@ -151,7 +153,7 @@ type Node struct {
     ID          string  `json:"id"`
     Type        string  `json:"type"`
     Description *string `json:"description,omitempty"`
-    Techonology *string `json:"techonlogy,omitempty"`
+    Technology  *string `json:"technology,omitempty"`
     Deployment  *string `json:"deployment,omitempty"`
     Nodes       []*Node `json:"nodes,omitempty"`
 }
@@ -160,7 +162,7 @@ type Link struct {
     From        string  `json:"from"`
     To          string  `json:"to"`
     Description string  `json:"description"`
-    Technology  *string `json:"techonology,omitempty"`
+    Technology  *string `json:"technology,omitempty"`
 }
 
 const (
@@ -168,7 +170,7 @@ const (
     TypeDepartment   = "department"
     TypeDomain       = "domain"
     TypeTeam         = "team"
-    TypeSystem       = "system"
+    TypeSystem       = "service"
     TypeApplication  = "application"
     TypeDatabase     = "database"
     TypeQueue        = "queue"
