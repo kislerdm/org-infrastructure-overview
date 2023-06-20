@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "definitions": {
+    "Type": {
+      "type": "string",
+      "description": "Node's type",
+      "enum": [
+        "organisation",
+        "department",
+        "domain",
+        "team",
+        "service",
+        "application",
+        "database",
+        "queue"
+      ]
+    },
+    "Node": {
+      "type": "object",
+      "description": "Element of the diagram, i.e. graph's node.",
+      "required": [
+        "id",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Node's name used to refer it."
+        },
+        "type": {
+          "$ref": "#/definitions/Type",
+          "description": "Node's type."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human friendly node's description."
+        },
+        "technology": {
+          "type": "string",
+          "description": "Application, or service technology."
+        },
+        "deployment": {
+          "type": "string",
+          "description": "Deployment environment for the application, or service."
+        },
+        "nodes": {
+          "type": "array",
+          "description": "Node's children.",
+          "items": {
+            "$ref": "#/definitions/Node"
+          }
+        }
+      }
+    },
+    "Link": {
+      "type": "object",
+      "description": "Connection between two Nodes, i.e. graph's edge.",
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "description": "Edge start's Node id."
+        },
+        "to": {
+          "type": "string",
+          "description": "Edge end's Node id."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human friendly description of the link between two Nodes."
+        },
+        "technology": {
+          "type": "string",
+          "description": "Interface technology and protocol, e.g. HTTP/JSON.",
+          "examples": [
+            "HTTP/JSON",
+            "sync, HTTP/JSON",
+            "TCP/Kafka Protocol"
+          ]
+        }
+      }
+    }
+  },
+  "type": "object",
+  "required": [
+    "nodes",
+    "links"
+  ],
+  "properties": {
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Node"
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Link"
+      }
+    }
+  }
+}

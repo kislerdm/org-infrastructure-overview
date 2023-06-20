@@ -1,0 +1,263 @@
+{
+  "nodes": [
+    {
+      "id": "Foo",
+      "description": "Organisation Foo",
+      "type": "organisation",
+      "nodes": [
+        {
+          "id": "DepartmentA",
+          "description": "Department A",
+          "type": "department",
+          "nodes": [
+            {
+              "id": "DomainA",
+              "description": "Domain A",
+              "type": "domain",
+              "nodes": [
+                {
+                  "id": "Team0",
+                  "description": "Team 0",
+                  "type": "team",
+                  "nodes": [
+                    {
+                      "id": "Service0",
+                      "description": "Service 0",
+                      "type": "service",
+                      "nodes": [
+                        {
+                          "id": "App1",
+                          "description": "Backend application",
+                          "type": "application",
+                          "technology": "Kotlin",
+                          "deployment": "AWS EKS"
+                        },
+                        {
+                          "id": "Database",
+                          "description": "Storage",
+                          "type": "database",
+                          "technology": "Postgres",
+                          "deployment": "AWS Aurora"
+                        },
+                        {
+                          "id": "Cache",
+                          "description": "Cache",
+                          "type": "database",
+                          "technology": "Redis",
+                          "deployment": "AWS Elasticache"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "Service1",
+                      "description": "Service 1",
+                      "type": "service",
+                      "nodes": [
+                        {
+                          "id": "App",
+                          "description": "Batch",
+                          "type": "application",
+                          "technology": "Kotlin",
+                          "deployment": "AWS EKS"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "Team1",
+                  "description": "Team 1",
+                  "type": "team",
+                  "nodes": [
+                    {
+                      "id": "Service2",
+                      "description": "Service 2",
+                      "type": "service",
+                      "nodes": [
+                        {
+                          "id": "App",
+                          "description": "WebClient",
+                          "type": "application",
+                          "technology": "JavaScript",
+                          "deployment": "AWS EKS"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "DomainB",
+              "description": "Domain B",
+              "type": "domain",
+              "nodes": [
+                {
+                  "id": "Team2",
+                  "description": "Team 2",
+                  "type": "team",
+                  "nodes": [
+                    {
+                      "id": "Service3",
+                      "description": "Service 3",
+                      "type": "service",
+                      "nodes": [
+                        {
+                          "id": "App",
+                          "description": "Analytics app",
+                          "type": "application",
+                          "technology": "Python",
+                          "deployment": "AWS EKS"
+                        },
+                        {
+                          "id": "Database",
+                          "description": "Storage",
+                          "type": "database",
+                          "technology": "AWS S3"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "DepartmentB",
+          "description": "Department B",
+          "type": "department",
+          "nodes": [
+            {
+              "id": "Team3",
+              "description": "Team 3",
+              "type": "team",
+              "nodes": [
+                {
+                  "id": "Service4",
+                  "description": "Streaming platform",
+                  "type": "service",
+                  "nodes": [
+                    {
+                      "id": "App1",
+                      "description": "Message broker",
+                      "type": "application",
+                      "technology": "Kafka",
+                      "deployment": "AWS MSK"
+                    },
+                    {
+                      "id": "App2",
+                      "description": "Schema registry",
+                      "type": "application",
+                      "technology": "AWS Glue Schema Registry"
+                    }
+                  ]
+                },
+                {
+                  "id": "Service5",
+                  "description": "Service 5",
+                  "type": "service",
+                  "nodes": [
+                    {
+                      "id": "App1",
+                      "description": "Syncs domain events to datalake",
+                      "type": "application",
+                      "technology": "Go",
+                      "deployment": "AWS EKS"
+                    },
+                    {
+                      "id": "Database",
+                      "description": "Datalake",
+                      "type": "database",
+                      "technology": "AWS S3"
+                    }
+                  ]
+                },
+                {
+                  "id": "Service6",
+                  "description": "Secrets manager",
+                  "type": "service",
+                  "technology": "AWS Secretsmanager"
+                }
+              ]
+            },
+            {
+              "id": "Team4",
+              "description": "Team 4",
+              "type": "team",
+              "nodes": [
+                {
+                  "id": "Service7",
+                  "description": "Mutates users' accounts",
+                  "type": "service",
+                  "nodes": [
+                    {
+                      "id": "app",
+                      "description": "Mutates users' accounts",
+                      "type": "application",
+                      "technology": "Go",
+                      "deployment": "AWS EKS"
+                    }
+                  ]
+                },
+                {
+                  "id": "Service8",
+                  "description": "Service 8",
+                  "type": "service",
+                  "nodes": [
+                    {
+                      "id": "iam",
+                      "description": "CIAM",
+                      "type": "application",
+                      "technology": "AWS Cognito"
+                    },
+                    {
+                      "id": "l0",
+                      "description": "Cognito trigger 1",
+                      "type": "application",
+                      "technology": "Go",
+                      "deployment": "AWS Lambda"
+                    },
+                    {
+                      "id": "l1",
+                      "description": "Cognito trigger 2",
+                      "type": "application",
+                      "technology": "Go",
+                      "deployment": "AWS Lambda"
+                    },
+                    {
+                      "id": "l2",
+                      "description": "Cognito trigger 3",
+                      "type": "application",
+                      "technology": "Go",
+                      "deployment": "AWS Lambda"
+                    }
+                  ]
+                },
+                {
+                  "id": "Service9",
+                  "description": "Email notification service",
+                  "type": "service",
+                  "technology": "AWS SES"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "from": "Foo.DepartmentA",
+      "to": "Foo.DepartmentB",
+      "description": "Uses streaming platform and CIAM",
+      "technology": "TCP"
+    },
+    {
+      "from": "Foo.DepartmentA.Team0",
+      "to": "Foo.DepartmentB",
+      "description": "Uses streaming platform and CIAM"
+    }
+  ]
+}
