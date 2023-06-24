@@ -1,0 +1,17 @@
+{
+  "name": "dynamic-c4diagram",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "testlive": "vitest",
+    "test": "vitest run --coverage",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.2",
+    "vite": "^4.3.9",
+    "vitest": "^0.32.2"
+  }
+}

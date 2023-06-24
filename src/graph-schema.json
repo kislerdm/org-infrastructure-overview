@@ -86,15 +86,15 @@
   },
   "type": "object",
   "required": [
-    "nodes",
-    "links"
+    "nodes"
   ],
   "properties": {
     "nodes": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/Node"
-      }
+      },
+      "minItems": 1
     },
     "links": {
       "type": "array",
