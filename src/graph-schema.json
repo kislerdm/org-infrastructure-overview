@@ -19,13 +19,13 @@
       "type": "object",
       "description": "Element of the diagram, i.e. graph's node.",
       "required": [
-        "id",
+        "name",
         "type"
       ],
       "properties": {
-        "id": {
+        "name": {
           "type": "string",
-          "description": "Node's name used to refer it."
+          "description": "Node's name."
         },
         "type": {
           "$ref": "#/definitions/Type",
@@ -42,6 +42,10 @@
         "deployment": {
           "type": "string",
           "description": "Deployment environment for the application, or service."
+        },
+        "id": {
+          "type": "string",
+          "description": "Node internal ID mutated upon object deserialization."
         },
         "nodes": {
           "type": "array",

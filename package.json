@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "testlive": "vitest",
-    "test": "vitest run --coverage",
+    "testlive": "vitest --live",
+    "test": "vitest",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"

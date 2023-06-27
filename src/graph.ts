@@ -1,28 +1,34 @@
 export type Node = {
     /**
-     * Node's name used to refer it.
+     * Human friendly node's name.
      */
-    id: string;
+    readonly name: string;
     /**
      * Node's type.
      */
-    type: Type;
+    readonly type: Type;
     /**
      * Human friendly node's description.
      */
-    description?: string;
+    readonly description?: string;
     /**
      * Application, or service technology.
      */
-    technology?: string;
+    readonly technology?: string;
     /**
      * Deployment environment for the application, or service.
      */
-    deployment?: string;
+    readonly deployment?: string;
     /**
      * Node's children.
      */
-    nodes?: Node[];
+    readonly nodes?: Node[];
+    /**
+     * Node's id.
+     *
+     * It's ignored upon read, but mutated to be compliant with regexp.
+     */
+    id?: string;
 }
 
 /**
@@ -46,98 +52,185 @@ type Link = {
     /**
      * Edge start's Node id.
      */
-    from: string;
+    readonly from: string;
     /**
      * Edge end's Node id.
      */
-    to: string;
+    readonly to: string;
     /**
      * Human friendly description of the link between two Nodes.
      */
-    description?: string;
+    readonly description?: string;
     /**
      * Interface technology and protocol, e.g. HTTP/JSON.
      */
-    technology?: string;
+    readonly technology?: string;
 }
 
 export type graph = {
-    nodes: Node[];
-    links?: Link[];
+    readonly nodes: Node[];
+    readonly links?: Link[];
 }
 
-export type NodeCompositeID = {
-    // foo.bar.baz as opposed to ...{id: foo, nodes: [{id: bar, nodes: [{id: baz }...
-    composite_id: string;
-    // baz
-    id: string;
-    description: string;
+const isValidNodeIDRegexp = /^([a-zA-Z0-9]+|([a-zA-Z0-9]+\.[a-zA-Z0-9]+)+)$/i;
+
+function isValidLinkNodeID(id: string) {
+    return isValidNodeIDRegexp.test(id)
 }
 
-export type GroupedNodes = {
-    [key in Type]: NodeCompositeID[];
-};
-
-function isValidNodeID(id: string) {
-    return !id.includes(".")
-}
-
-function validNodesID(nodes: Node[]) {
-    for (const node of nodes) {
-        if (!isValidNodeID(node.id)) {
-            return false;
-        }
-        if (node.nodes !== undefined && !validNodesID(node.nodes)) {
-            return false
+function nodeToC4Diagram(node: Node): string {
+    function containerSuffix(type: Type.Application | Type.Database | Type.Queue) {
+        switch (type) {
+            case Type.Database:
+                return "Db"
+            case Type.Queue:
+                return "Queue"
+            default:
+                return ""
         }
     }
-    return true;
+
+    function nodeName(node: Node): string {
+        if (node.name != undefined && node.name != "") {
+            return node.name
+        }
+        return node.id.split(".").slice(-1)[0];
+    }
+
+    switch (node.type) {
+        case Type.Application:
+        case Type.Database:
+        case Type.Queue:
+            let tech = node.technology;
+            if (node.deployment != undefined && node.deployment != "") {
+                if (tech != undefined && tech != "") {
+                    tech = `${tech}/${node.deployment}`;
+                } else {
+                    tech = node.deployment;
+                }
+            }
+            return `Container${containerSuffix(node.type)}(${node.id},"${nodeName}","${tech}","${node.description}")`;
+        default:
+            return `System(${node.id},"${nodeName}","${node.description}")`
+    }
+}
+
+function linkToC4Diagram(link: Link): string {
+    return `Rel(${link.from},${link.to},"${link.description}","${link.technology}")`
 }
 
 /**
  * Defines the graph.
  */
 export class Graph {
-    nodes: Node[]
-    links?: Link[]
+    readonly nodes: Node[]
+    readonly links: Link[] = []
 
     constructor(v: object) {
         const raw: graph = cast(v, r("graph"));
 
-        if (!validNodesID(raw.nodes)) {
-            throw new Error("unexpected node id");
-        }
-
         this.nodes = raw.nodes
-        this.links = raw.links
+        this.mutateID(this.nodes)
+
+        if (raw.links !== undefined) {
+            for (const link of raw.links) {
+                if (!isValidLinkNodeID(link.from)) {
+                    throw new Error("unexpected link's 'from' id");
+                }
+
+                if (this.getNodeByID(link.from) === undefined) {
+                    throw new Error("node with link's 'from' id not found");
+                }
+
+                if (!isValidLinkNodeID(link.to)) {
+                    throw new Error("unexpected link's 'to' id");
+                }
+
+                if (this.getNodeByID(link.to) === undefined) {
+                    throw new Error("node with link's 'to' id not found");
+                }
+            }
+
+            this.links = raw.links
+        }
     }
 
-    listGroupedNodes(): GroupedNodes {
-        // TODO: BFS graph traversal to fill the struct
-        return {
-            organisation: [],
-            application: [],
-            database: [],
-            department: [],
-            domain: [],
-            queue: [],
-            service: [],
-            team: []
-        };
-    }
-
-    defineC4Diagram(composite_id: string, zoomLevel: string): string {
-        const n = this.getNodeByCompositeID(composite_id);
+    defineC4Diagram(id: string): string {
+        const n = this.getNodeByID(id);
         if (n === undefined) {
             throw Error("node not found")
         }
-        return "";
+
+        let o = "C4Context";
+
+        const links = this.getLinksByID(id);
+
+        const linkedNodes: Node[] = [];
+        for (const link of links) {
+            for (const lID of [link.from, link.to]) {
+                try {
+                    linkedNodes.push(this.getNodeByID(lID)!);
+                } catch (e) {
+                    throw Error(`linked node with id ${lID} is not found`)
+                }
+            }
+        }
+
+        const c4Links = links.map((link) => linkToC4Diagram(link)).join("\n");
+
+        const selectedNodeC4 = nodeToC4Diagram(n);
+
+        return o;
     }
 
-    private getNodeByCompositeID(id: string): Node | undefined {
-        // TODO: implement DFS
-        return undefined
+    private getLinksByID(id: string): Link[] {
+        let o: Link[] = [];
+        for (const link of this.links) {
+            if (link.from == id || link.to == id) {
+                o.push(link)
+            }
+        }
+        return o
     }
+
+    getNodeByID(id: string): Node | undefined {
+        return getNodeByID(this.nodes, id, "")
+    }
+
+    private mutateID(nodes: Node[], root_namespace: string = "") {
+        function generateIDUsingName(name: string): string {
+            return name.replace(RegExp("[\\s\.\,\!\?\/\\\\:\;\*\$\%\#\"\'\&\(\)\=]+"), "")
+        }
+
+        nodes.forEach(node => {
+            node.id = generateIDUsingName(node.name);
+            if (root_namespace != "") {
+                node.id = `${root_namespace}.${node.id}`
+            }
+
+            if (node.nodes != undefined) {
+                this.mutateID(node.nodes, node.id)
+            }
+        })
+    }
+}
+
+function getNodeByID(nodes: Node[], id: string, root_id: string = ""): Node | undefined {
+    let id_flag = id.replace(root_id, "");
+    if (id_flag.startsWith(".")) {
+        id_flag = id_flag.slice(1);
+    }
+    id_flag = id_flag.split(".")[0];
+
+    if (root_id !== "") {
+        id_flag = `${root_id}.${id_flag}`
+    }
+
+    const n = nodes.find(n => n.id === id_flag);
+    if (id_flag === id) {
+        return n
+    }
+    return getNodeByID(n!.nodes!, id, id_flag)
 }
 
 /**
@@ -297,7 +390,8 @@ const typeMap: any = {
     "Node": o([
         {json: "deployment", js: "deployment", typ: u(undefined, "")},
         {json: "description", js: "description", typ: u(undefined, "")},
-        {json: "id", js: "id", typ: ""},
+        {json: "name", js: "name", typ: ""},
+        {json: "id", js: "id", typ: u(undefined, "")},
         {json: "nodes", js: "nodes", typ: u(undefined, a(r("Node")))},
         {json: "technology", js: "technology", typ: u(undefined, "")},
         {json: "type", js: "type", typ: r("Type")},

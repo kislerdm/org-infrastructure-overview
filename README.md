@@ -60,8 +60,8 @@ nodes which belong to selected level's node and the linked nodes from other leve
 - _Service1_ is a _Kotlin_ application to run batch jobs on database.
 - _Service2_ is a _JavaScript_ application deployed to AWS EKS.
 - _Service3_ consists of two containers:
-  - _App_: _Python_ analytics app deployed to AWS EKS;
-  - _Database_: S3 bucket. 
+  - _App_: _Python_ batch processing app deployed to AWS EKS;
+  - _Database_: analytics db AWS Redshift.
 - _Service4_ consists of three containers:
   - _App1_: _Kafka_ deployed as AWS MSK; 
   - _App2_: _Schema Registry_ deployed as _AWS Glue Schema Registry_;
@@ -98,17 +98,32 @@ Enterprise_Boundary(foo, "Organisation Foo") {
           Component(team1, "Team 1")
       }
   }
-  
   Enterprise_Boundary(departmentB, "Department B") {
       Component_Ext(team3, "Team 3")
       Component_Ext(team4, "Team 4")
   }
 }
-
 Rel(team1, team0, "")
 Rel(team0, team4, "")
 Rel(team0, team3, "")
 Rel(team1, team4, "")
+```
+
+```mermaid
+C4Context
+Enterprise_Boundary(Foo.DepartmentA, "DepartmentA") {
+Enterprise_Boundary(Foo.DepartmentA.DomainA, "DomainA") {
+Component(Foo.DepartmentA.DomainA.Team0, "Team0")
+Component_Ext(Foo.DepartmentA.DomainA.Team1, "Team1")
+}
+}
+Enterprise_Boundary(Foo.DepartmentB, "DepartmentB") {
+Component_Ext(Foo.DepartmentB.Team3, "Team3")
+Component_Ext(Foo.DepartmentB.Team4, "Team4")
+}
+Rel(Foo.DepartmentA.DomainA.Team0,Foo.DepartmentB.Team3,"")
+Rel(Foo.DepartmentA.DomainA.Team0,Foo.DepartmentB.Team4,"")
+Rel(Foo.DepartmentA.DomainA.Team1,Foo.DepartmentA.DomainA.Team0,"")
 ```
 
 #### Test Scenario - Container Level
@@ -128,15 +143,12 @@ C4Context
 Enterprise_Boundary(team1, "Team 1") {
     Container(team1.app, "WebClient", "JavaScript/AWS EKS")
 }
-
 Enterprise_Boundary(team0, "Team 0") {
     Container_Ext(team0.app, "Backend", "Kotlin/AWS EKS")
 }
-
 Enterprise_Boundary(team4, "Team 4") {
     Container_Ext(iam, "CIAM", "AWS Cognito")
 }
-
 Rel(team1.app, team0.app, "")
 Rel(team1.app, iam, "")
 ```
