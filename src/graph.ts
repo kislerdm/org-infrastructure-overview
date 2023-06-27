@@ -48,7 +48,7 @@ export enum Type {
 /**
  * Connection between two Nodes, i.e. graph's edge.
  */
-type Link = {
+export type Link = {
     /**
      * Edge start's Node id.
      */
@@ -67,7 +67,7 @@ type Link = {
     readonly technology?: string;
 }
 
-export type graph = {
+type graph = {
     readonly nodes: Node[];
     readonly links?: Link[];
 }
@@ -76,47 +76,6 @@ const isValidNodeIDRegexp = /^([a-zA-Z0-9]+|([a-zA-Z0-9]+\.[a-zA-Z0-9]+)+)$/i;
 
 function isValidLinkNodeID(id: string) {
     return isValidNodeIDRegexp.test(id)
-}
-
-function nodeToC4Diagram(node: Node): string {
-    function containerSuffix(type: Type.Application | Type.Database | Type.Queue) {
-        switch (type) {
-            case Type.Database:
-                return "Db"
-            case Type.Queue:
-                return "Queue"
-            default:
-                return ""
-        }
-    }
-
-    function nodeName(node: Node): string {
-        if (node.name != undefined && node.name != "") {
-            return node.name
-        }
-        return node.id.split(".").slice(-1)[0];
-    }
-
-    switch (node.type) {
-        case Type.Application:
-        case Type.Database:
-        case Type.Queue:
-            let tech = node.technology;
-            if (node.deployment != undefined && node.deployment != "") {
-                if (tech != undefined && tech != "") {
-                    tech = `${tech}/${node.deployment}`;
-                } else {
-                    tech = node.deployment;
-                }
-            }
-            return `Container${containerSuffix(node.type)}(${node.id},"${nodeName}","${tech}","${node.description}")`;
-        default:
-            return `System(${node.id},"${nodeName}","${node.description}")`
-    }
-}
-
-function linkToC4Diagram(link: Link): string {
-    return `Rel(${link.from},${link.to},"${link.description}","${link.technology}")`
 }
 
 /**
@@ -155,35 +114,7 @@ export class Graph {
         }
     }
 
-    defineC4Diagram(id: string): string {
-        const n = this.getNodeByID(id);
-        if (n === undefined) {
-            throw Error("node not found")
-        }
-
-        let o = "C4Context";
-
-        const links = this.getLinksByID(id);
-
-        const linkedNodes: Node[] = [];
-        for (const link of links) {
-            for (const lID of [link.from, link.to]) {
-                try {
-                    linkedNodes.push(this.getNodeByID(lID)!);
-                } catch (e) {
-                    throw Error(`linked node with id ${lID} is not found`)
-                }
-            }
-        }
-
-        const c4Links = links.map((link) => linkToC4Diagram(link)).join("\n");
-
-        const selectedNodeC4 = nodeToC4Diagram(n);
-
-        return o;
-    }
-
-    private getLinksByID(id: string): Link[] {
+    getLinksByID(id: string): Link[] {
         let o: Link[] = [];
         for (const link of this.links) {
             if (link.from == id || link.to == id) {
