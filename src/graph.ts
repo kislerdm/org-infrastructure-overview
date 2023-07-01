@@ -31,6 +31,10 @@ export type Node = {
     id?: string;
 }
 
+export function GetNodeParentID(n: Node): string {
+    return n.id?.split(".").slice(0, -1).join(".")!
+}
+
 /**
  * Node's type.
  */
@@ -76,6 +80,24 @@ const isValidNodeIDRegexp = /^([a-zA-Z0-9]+|([a-zA-Z0-9]+\.[a-zA-Z0-9]+)+)$/i;
 
 function isValidLinkNodeID(id: string) {
     return isValidNodeIDRegexp.test(id)
+}
+
+function getNodeByID(nodes: Node[], id: string, root_id: string = ""): Node | undefined {
+    let id_flag = id.replace(root_id, "");
+    if (id_flag.startsWith(".")) {
+        id_flag = id_flag.slice(1);
+    }
+    id_flag = id_flag.split(".")[0];
+
+    if (root_id !== "") {
+        id_flag = `${root_id}.${id_flag}`
+    }
+
+    const n = nodes.find(n => n.id === id_flag);
+    if (id_flag === id) {
+        return n
+    }
+    return getNodeByID(n!.nodes!, id, id_flag)
 }
 
 /**
@@ -144,24 +166,6 @@ export class Graph {
             }
         })
     }
-}
-
-function getNodeByID(nodes: Node[], id: string, root_id: string = ""): Node | undefined {
-    let id_flag = id.replace(root_id, "");
-    if (id_flag.startsWith(".")) {
-        id_flag = id_flag.slice(1);
-    }
-    id_flag = id_flag.split(".")[0];
-
-    if (root_id !== "") {
-        id_flag = `${root_id}.${id_flag}`
-    }
-
-    const n = nodes.find(n => n.id === id_flag);
-    if (id_flag === id) {
-        return n
-    }
-    return getNodeByID(n!.nodes!, id, id_flag)
 }
 
 /**

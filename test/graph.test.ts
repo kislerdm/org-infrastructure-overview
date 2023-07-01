@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {Graph, Type} from "../src/graph";
+import {GetNodeParentID, Graph, Type} from "../src/graph";
 
 describe("Graph", () => {
     describe("initialisation", () => {
@@ -319,6 +319,37 @@ describe("Graph", () => {
             });
 
             expect(input.getLinksByID("foo.s0.a0").length).toEqual(3);
+        })
+    })
+})
+
+describe("GetNodeParentID", () => {
+    const tests = [
+        {
+            name: "shall yield empty string on empty string input",
+            input: {id: "", name: "foo", type: Type.Team},
+            want: "",
+        },
+        {
+            name: "shall yield empty string on root input",
+            input: {id: "foo", name: "foo", type: Type.Team},
+            want: "",
+        },
+        {
+            name: "shall yield parent node's id with the parent which has the parent",
+            input: {id: "foo.bar.baz", name: "baz", type: Type.Service},
+            want: "foo.bar",
+        },
+        {
+            name: "shall yield parent node's id with a single parent",
+            input: {id: "foo.bar", name: "bar", type: Type.Service},
+            want: "foo",
+        },
+    ]
+    tests.forEach(test => {
+        it(test.name, () => {
+            const got = GetNodeParentID(test.input);
+            expect(got).toEqual(test.want);
         })
     })
 })
