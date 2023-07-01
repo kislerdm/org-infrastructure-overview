@@ -1,6 +1,6 @@
 import {describe, expect, it} from "vitest";
 import {Graph, Type} from "../src/graph";
-import {DefineC4Diagram} from "../src/diagram";
+import {DefineC4DiagramPlantUML} from "../src/diagram";
 
 const example_graph = {
     nodes: [
@@ -400,18 +400,16 @@ describe("DefineC4Diagram", () => {
     const g = new Graph(example_graph);
 
     it("shall yield the diagram of centered on Team0 with three links", () => {
-        expect(DefineC4Diagram(g, "Foo.DepartmentA.DomainA.Team0")).toBe(`C4Context
-Enterprise_Boundary(Foo.DepartmentA.DomainA, "DomainA") {
-Component(Foo.DepartmentA.Team0, "Team0")
-Component(Foo.DepartmentA.Team1, "Team1")
+        expect(DefineC4DiagramPlantUML(g, "Foo.DepartmentA.DomainA.Team0")).toEqual(`Enterprise_Boundary(Foo.DepartmentA.DomainA,"DomainA"){
+Component(Foo.DepartmentA.DomainA.Team0,"Team0","backend")
+Component_Ext(Foo.DepartmentA.DomainA.Team1,"Team1","frontend")
 }
-Enterprise_Boundary(Foo.DepartmentB, "DepartmentB") {
-Component_Ext(Foo.DepartmentB.Team3, "Team3")
-Component_Ext(Foo.DepartmentB.Team4, "Team4")
+Enterprise_Boundary(Foo.DepartmentB,"DepartmentB"){
+Component_Ext(Foo.DepartmentB.Team3,"Team3","streaming platform")
+Component_Ext(Foo.DepartmentB.Team4,"Team4","CIAM")
 }
-Rel(Foo.DepartmentA.DomainA.Team0,Foo.DepartmentB.Team3)
-Rel(Foo.DepartmentA.DomainA.Team0,Foo.DepartmentB.Team3)
-Rel(Foo.DepartmentA.DomainA.Team1,Foo.DepartmentA.DomainA.Team0)
-`)
+Rel(Foo.DepartmentA.DomainA.Team0,Foo.DepartmentB.Team3,"","")
+Rel(Foo.DepartmentA.DomainA.Team0,Foo.DepartmentB.Team4,"","")
+Rel(Foo.DepartmentA.DomainA.Team1,Foo.DepartmentA.DomainA.Team0,"","")`)
     })
 })
