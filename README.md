@@ -154,7 +154,7 @@ Rel(team1.app, iam, "")
 ```
 
 ## Data Structure
-
+[README.md](README.md)
 ```go
 type graph struct {
     Nodes []*Node `json:"nodes,omitempty"`

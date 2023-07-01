@@ -565,13 +565,7 @@ const example_graph = {
         },
         {
             from: "Foo.DepartmentA.DomainA.Team1.Service2",
-            to: "Foo.DepartmentA.DomainA.Team0.Service0.App1",
-            description: "Uses to process user's requests",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team1.Service2",
-            to: "Foo.DepartmentB.Team4.Service8.IAM",
+            to: "Foo.DepartmentB.Team4.Service8",
             description: "Authenticates users",
             technology: "sync, HTTP/JSON"
         },
@@ -691,7 +685,7 @@ const example_graph = {
 describe("Graph.serialiseToPlantUML", () => {
     const g = new Graph(example_graph);
 
-    it("shall yield the diagram of centered on Team0 with three links", () => {
+    it("shall yield the diagram centered on Team0 with three links", () => {
         expect(g.serialiseToPlantUML("Foo.DepartmentA.DomainA.Team0")).toEqual(`Enterprise_Boundary(Foo.DepartmentA.DomainA,"DomainA"){
 Component(Foo.DepartmentA.DomainA.Team0,"Team0","backend")
 Component_Ext(Foo.DepartmentA.DomainA.Team1,"Team1","frontend")
@@ -705,7 +699,17 @@ Rel(Foo.DepartmentA.DomainA.Team0,Foo.DepartmentB.Team4,"","")
 Rel(Foo.DepartmentA.DomainA.Team1,Foo.DepartmentA.DomainA.Team0,"","")`)
     })
 
-    it("shall yield the diagram of centered on Team0 with three links", () => {
-
+    it("shall yield the diagram centered on WebApplication two links", () => {
+        expect(g.serialiseToPlantUML("Foo.DepartmentA.DomainA.Team1.Service2")).toEqual(`Enterprise_Boundary(Foo.DepartmentA.DomainA.Team1,"Team1"){
+Container(Foo.DepartmentA.DomainA.Team1.Service2,"Service2","JavaScript/AWS EKS","web application used by clients")
+}
+Enterprise_Boundary(Foo.DepartmentA.DomainA.Team0,"Team0"){
+System_Ext(Foo.DepartmentA.DomainA.Team0.Service0,"Service0","")
+}
+Enterprise_Boundary(Foo.DepartmentB.Team4,"Team4"){
+System_Ext(Foo.DepartmentB.Team4.Service8,"Service8","IAM")
+}
+Rel(Foo.DepartmentA.DomainA.Team1.Service2,Foo.DepartmentA.DomainA.Team0.Service0,"Uses to process user's requests","sync, HTTP/JSON")
+Rel(Foo.DepartmentA.DomainA.Team1.Service2,Foo.DepartmentB.Team4.Service8,"Authenticates users","sync, HTTP/JSON")`)
     })
 })
