@@ -1,4 +1,97 @@
-export type Node = {
+export default class Graph {
+    readonly nodes: Node[]
+    readonly links: Link[] = []
+
+    constructor(v: object) {
+        const raw: Graph = cast(v, r("Graph"));
+
+        this.nodes = readRawNodes(raw.nodes, "");
+
+        if (raw.links !== undefined) {
+            for (const l of raw.links) {
+                if (!isValidLinkNodeID(l.from)) {
+                    throw new Error("unexpected link's 'from' id");
+                }
+
+                if (getNodeByID(this.nodes, l.from) === undefined) {
+                    throw new Error("node with link's 'from' id not found");
+                }
+
+                if (!isValidLinkNodeID(l.to)) {
+                    throw new Error("unexpected link's 'to' id");
+                }
+
+                if (getNodeByID(this.nodes, l.to) === undefined) {
+                    throw new Error("node with link's 'to' id not found");
+                }
+
+                this.links.push(new link(l.from, l.to, l.description, l.technology))
+            }
+        }
+    }
+
+    /**
+     * serialiseToPlantUML defines the C4 diagram using PlantUML DSL.
+     *
+     * @param zoom_node_id (string): Node id to focus the diagram on.
+     * @return (string) Diagram definition.
+     */
+    serialiseToPlantUML(zoom_node_id: string): string {
+        const n: Node | undefined = getNodeByID(this.nodes, zoom_node_id);
+        if (n === undefined) {
+            throw Error("node not found")
+        }
+
+        const group: nodesGroup = {};
+        group[n.parentID()] = [{node: n, is_external: false}];
+
+        const links: Link[] = []
+
+        for (const link of this.links) {
+            if (link.from == zoom_node_id || link.to == zoom_node_id) {
+                links.push(link)
+            }
+        }
+
+        links.forEach(link => {
+            let id: string = "";
+            if (link.to !== n.id()) {
+                id = link.to;
+            } else if (link.from !== n.id()) {
+                id = link.from;
+            }
+
+            if (id != "") {
+                const nodeExt = getNodeByID(this.nodes, id)!;
+                const extNodeParent = nodeExt.parentID();
+                if (group[extNodeParent] === undefined) {
+                    group[extNodeParent] = [];
+                }
+                group[extNodeParent].push({node: nodeExt, is_external: true});
+            }
+        })
+
+        let c4NodesDefinition = ""
+        for (const [groupNodeID, groupNodes] of Object.entries(group)) {
+            let nodesDefinition = groupNodes
+                .map(node => node.node.serialiseToPlantUML(node.is_external))
+                .join("\n");
+            if (groupNodeID !== "") {
+                const boundaryDefinition = boundaryC4Diagram(getNodeByID(this.nodes, groupNodeID)!);
+                if (boundaryDefinition != "") {
+                    nodesDefinition = `${boundaryDefinition}{\n${nodesDefinition}\n}`
+                }
+            }
+            c4NodesDefinition += `${nodesDefinition}\n`;
+        }
+
+        const c4LinksDefinition = links.map((link) => link.serialiseToPlantUML()).join("\n");
+
+        return `${c4NodesDefinition}${c4LinksDefinition}`;
+    }
+}
+
+interface Node {
     /**
      * Human friendly node's name.
      */
@@ -23,22 +116,107 @@ export type Node = {
      * Node's children.
      */
     readonly nodes?: Node[];
+
     /**
-     * Node's id.
-     *
-     * It's ignored upon read, but mutated to be compliant with regexp.
+     * Node's ID.
      */
-    id?: string;
+    id(): string;
+
+    /**
+     * Node's parent.
+     */
+    parentID(): string;
+
+    /**
+     * Serialises using the PlantUML DSL.
+     *
+     * @param is_external (boolean): Defines if the node is an external system.
+     * @return (string): PlantUML DSL definition of the Node's container.
+     */
+    serialiseToPlantUML(is_external: boolean): string;
 }
 
-export function GetNodeParentID(n: Node): string {
-    return n.id?.split(".").slice(0, -1).join(".")!
+const idPattern = RegExp("[\\s\.\,\!\?\/\\\\:\;\*\$\%\#\"\'\&\(\)\=]+");
+
+class node {
+    readonly name: string;
+    readonly description: string = "";
+    readonly type: Type;
+    readonly technology: string = "";
+    readonly deployment: string = "";
+
+    private readonly _id: string;
+
+    private readonly _parentID: string;
+
+    nodes: Node[];
+
+    constructor(name: string, type: Type, parentID: string = "", description: string = "", technology: string = "", deployment: string = "") {
+        this.name = name;
+        this._parentID = parentID;
+
+        this._id = name.replace(idPattern, "")
+        if (this._parentID != "") {
+            this._id = `${this._parentID}.${this._id}`
+        }
+
+        this.type = type;
+        this.description = description;
+        this.technology = technology;
+        this.deployment = deployment;
+        this.nodes = [];
+    }
+
+    parentID(): string {
+        return this._parentID;
+    }
+
+    id(): string {
+        return this._id;
+    }
+
+    serialiseToPlantUML(is_external: boolean): string {
+        function containerSuffix(type: Type) {
+            switch (type) {
+                case Type.Database:
+                    return "Db"
+                case Type.Queue:
+                    return "Queue"
+                default:
+                    return ""
+            }
+        }
+
+        const externalPrefix = is_external ? "_Ext" : "";
+
+        switch (this.type) {
+            case Type.Application:
+            case Type.Database:
+            case Type.Queue:
+                let tech = this.technology;
+                if (this.deployment != "") {
+                    if (tech != "") {
+                        tech = `${tech}/${this.deployment}`;
+                    } else {
+                        tech = this.deployment!;
+                    }
+                }
+                return `Container${containerSuffix(this.type)}${externalPrefix}(${this._id},"${this.name}","${tech}","${this.description}")`;
+            case Type.Team:
+            case Type.Organisation:
+            case Type.Department:
+            case Type.Domain:
+                return `Component${externalPrefix}(${this._id},"${this.name}","${this.description}")`
+            default:
+                return `System${externalPrefix}(${this._id},"${this.name}","${this.description}")`
+        }
+    }
 }
 
 /**
  * Node's type.
  */
-export enum Type {
+enum Type {
     Organisation = "organisation",
     Department = "department",
     Domain = "domain",
@@ -52,7 +230,7 @@ export enum Type {
 /**
  * Connection between two Nodes, i.e. graph's edge.
  */
-export type Link = {
+interface Link {
     /**
      * Edge start's Node id.
      */
@@ -69,11 +247,35 @@ export type Link = {
      * Interface technology and protocol, e.g. HTTP/JSON.
      */
     readonly technology?: string;
+
+    /**
+     * Serialises using the PlantUML DSL.
+     *
+     * @return (string): PlantUML DSL definition of the Nodes' relation.
+     */
+    serialiseToPlantUML(): string;
 }
 
-type graph = {
-    readonly nodes: Node[];
-    readonly links?: Link[];
+class link {
+    readonly from: string;
+    readonly to: string;
+    readonly description: string = "";
+    readonly technology: string = "";
+
+    constructor(from: string, to: string, description: string = "", technology: string = "") {
+        this.from = from;
+        this.to = to;
+        if (description != undefined) {
+            this.description = description;
+        }
+        if (technology != undefined) {
+            this.technology = technology;
+        }
+    }
+
+    serialiseToPlantUML(): string {
+        return `Rel(${this.from},${this.to},"${this.description}","${this.technology}")`
+    }
 }
 
 const isValidNodeIDRegexp = /^([a-zA-Z0-9]+|([a-zA-Z0-9]+\.[a-zA-Z0-9]+)+)$/i;
@@ -93,79 +295,46 @@ function getNodeByID(nodes: Node[], id: string, root_id: string = ""): Node | un
         id_flag = `${root_id}.${id_flag}`
     }
 
-    const n = nodes.find(n => n.id === id_flag);
+    const n = nodes.find(n => n.id() === id_flag);
     if (id_flag === id) {
         return n
     }
     return getNodeByID(n!.nodes!, id, id_flag)
 }
 
-/**
- * Defines the graph.
- */
-export class Graph {
-    readonly nodes: Node[]
-    readonly links: Link[] = []
-
-    constructor(v: object) {
-        const raw: graph = cast(v, r("graph"));
-
-        this.nodes = raw.nodes
-        this.mutateID(this.nodes)
-
-        if (raw.links !== undefined) {
-            for (const link of raw.links) {
-                if (!isValidLinkNodeID(link.from)) {
-                    throw new Error("unexpected link's 'from' id");
-                }
-
-                if (this.getNodeByID(link.from) === undefined) {
-                    throw new Error("node with link's 'from' id not found");
-                }
-
-                if (!isValidLinkNodeID(link.to)) {
-                    throw new Error("unexpected link's 'to' id");
-                }
-
-                if (this.getNodeByID(link.to) === undefined) {
-                    throw new Error("node with link's 'to' id not found");
-                }
-            }
-
-            this.links = raw.links
+function readRawNodes(nodes: Node[], parent_id: string): Node[] {
+    const output: Node[] = []
+    nodes.forEach(n => {
+        const nn = new node(n.name, n.type, parent_id, n.description, n.technology, n.deployment);
+        if (n.nodes !== undefined) {
+            nn.nodes = readRawNodes(n.nodes, nn.id())
         }
+        output.push(nn);
+    })
+    return output;
+}
+
+function boundaryC4Diagram(node: Node): string {
+    switch (node.type) {
+        case Type.Domain:
+        case Type.Team:
+        case Type.Organisation:
+        case Type.Department:
+            return `Enterprise_Boundary(${node.id()},"${node.name}")`
+        case Type.Service:
+            return `System_Boundary(${node.id()},"${node.name}")`
+        default:
+            return ""
     }
+}
 
-    getLinksByID(id: string): Link[] {
-        let o: Link[] = [];
-        for (const link of this.links) {
-            if (link.from == id || link.to == id) {
-                o.push(link)
-            }
-        }
-        return o
-    }
+type nodeMap = {
+    node: Node;
+    is_external: boolean;
+}
 
-    getNodeByID(id: string): Node | undefined {
-        return getNodeByID(this.nodes, id, "")
-    }
-
-    private mutateID(nodes: Node[], root_namespace: string = "") {
-        function generateIDUsingName(name: string): string {
-            return name.replace(RegExp("[\\s\.\,\!\?\/\\\\:\;\*\$\%\#\"\'\&\(\)\=]+"), "")
-        }
-
-        nodes.forEach(node => {
-            node.id = generateIDUsingName(node.name);
-            if (root_namespace != "") {
-                node.id = `${root_namespace}.${node.id}`
-            }
-
-            if (node.nodes != undefined) {
-                this.mutateID(node.nodes, node.id)
-            }
-        })
-    }
+type nodesGroup = {
+    [key: string]: nodeMap[];
 }
 
 /**
@@ -312,24 +481,23 @@ function r(name: string) {
 }
 
 const typeMap: any = {
-    "graph": o([
+    "Graph": o([
         {json: "links", js: "links", typ: u(undefined, a(r("Link")))},
         {json: "nodes", js: "nodes", typ: a(r("Node"))},
     ], "any"),
     "Link": o([
-        {json: "description", js: "description", typ: u(undefined, "")},
         {json: "from", js: "from", typ: ""},
-        {json: "technology", js: "technology", typ: u(undefined, "")},
         {json: "to", js: "to", typ: ""},
+        {json: "description", js: "description", typ: u(undefined, "")},
+        {json: "technology", js: "technology", typ: u(undefined, "")},
     ], "any"),
     "Node": o([
+        {json: "name", js: "name", typ: ""},
+        {json: "type", js: "type", typ: r("Type")},
         {json: "deployment", js: "deployment", typ: u(undefined, "")},
         {json: "description", js: "description", typ: u(undefined, "")},
-        {json: "name", js: "name", typ: ""},
-        {json: "id", js: "id", typ: u(undefined, "")},
-        {json: "nodes", js: "nodes", typ: u(undefined, a(r("Node")))},
         {json: "technology", js: "technology", typ: u(undefined, "")},
-        {json: "type", js: "type", typ: r("Type")},
+        {json: "nodes", js: "nodes", typ: u(undefined, a(r("Node")))},
     ], "any"),
     "Type": [
         "application",

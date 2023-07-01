@@ -4,12 +4,14 @@
   "type": "module",
   "scripts": {
     "testlive": "vitest --live",
-    "test": "vitest",
+    "test": "vitest run --coverage",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^0.32.2",
+    "jsdom": "^22.1.0",
     "typescript": "^5.0.2",
     "vite": "^4.3.9",
     "vitest": "^0.32.2"

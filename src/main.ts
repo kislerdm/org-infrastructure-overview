@@ -1,12 +1,12 @@
 import './style.css';
-import {Graph, GroupedNodes} from './graph.ts';
+import Graph from './graph.ts';
 
 function Output(): string {
     return ""
 }
 
 function Input(data: Graph): string {
-    if (data.listGroupedNodes() == undefined) {
+    if (data.nodes.length == 0) {
         return `<div class="alert">Faulty data</dev>`
     }
     return `<h1>Hi!</h1>`
@@ -15,11 +15,8 @@ function Input(data: Graph): string {
 const data: Graph = {
     nodes: [],
     links: [],
-    defineC4Diagram(composite_id: string, zoomLevel: string): string {
+    serialiseToPlantUML(_: string): string {
         return "";
-    },
-    listGroupedNodes(): GroupedNodes {
-        return undefined;
     },
 };
 
