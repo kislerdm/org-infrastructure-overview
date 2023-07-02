@@ -137,6 +137,7 @@ declare interface Node {
 }
 
 const idPattern = RegExp("[\\s\.\,\!\?\/\\\\:\;\*\$\%\#\"\'\&\(\)\=]+");
+const nodeIDRouteSeparator: string = "/";
 
 class node {
     readonly name: string;
@@ -157,7 +158,7 @@ class node {
 
         this._id = name.replace(idPattern, "")
         if (this._parentID != "") {
-            this._id = `${this._parentID}.${this._id}`
+            this._id = `${this._parentID}${nodeIDRouteSeparator}${this._id}`
         }
 
         this.type = type;
@@ -284,7 +285,7 @@ class link {
     }
 }
 
-const isValidNodeIDRegexp = /^([a-zA-Z0-9]+|([a-zA-Z0-9]+\.[a-zA-Z0-9]+)+)$/i;
+const isValidNodeIDRegexp = /^([a-zA-Z0-9]+|([a-zA-Z0-9]+\/[a-zA-Z0-9]+)+)$/i;
 
 function isValidLinkNodeID(id: string) {
     return isValidNodeIDRegexp.test(id)
@@ -292,13 +293,13 @@ function isValidLinkNodeID(id: string) {
 
 function getNodeByID(nodes: Node[], id: string, root_id: string = ""): Node | undefined {
     let id_flag = id.replace(root_id, "");
-    if (id_flag.startsWith(".")) {
+    if (id_flag.startsWith(nodeIDRouteSeparator)) {
         id_flag = id_flag.slice(1);
     }
-    id_flag = id_flag.split(".")[0];
+    id_flag = id_flag.split(nodeIDRouteSeparator)[0];
 
     if (root_id !== "") {
-        id_flag = `${root_id}.${id_flag}`
+        id_flag = `${root_id}${nodeIDRouteSeparator}${id_flag}`
     }
 
     const n = nodes.find(n => n.id() === id_flag);

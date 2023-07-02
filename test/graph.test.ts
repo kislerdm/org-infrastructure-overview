@@ -1,5 +1,7 @@
 import {describe, expect, it} from "vitest";
 import Graph from "../src/graph";
+// @ts-ignore
+import example_graph from "../src/data.json";
 
 describe("new Graph", () => {
     describe("initialisation", () => {
@@ -92,13 +94,13 @@ describe("new Graph", () => {
 
                     expect(g.nodes[0].nodes[0].name).toStrictEqual("bar")
                     expect(g.nodes[0].nodes[0].type).toStrictEqual("department")
-                    expect(g.nodes[0].nodes[0].id()).toStrictEqual("foo.bar")
+                    expect(g.nodes[0].nodes[0].id()).toStrictEqual("foo/bar")
                     expect(g.nodes[0].nodes[0].parentID()).toStrictEqual("foo")
 
                     expect(g.nodes[0].nodes[0].nodes[0].name).toStrictEqual("baz")
                     expect(g.nodes[0].nodes[0].nodes[0].type).toStrictEqual("service")
-                    expect(g.nodes[0].nodes[0].nodes[0].id()).toStrictEqual("foo.bar.baz")
-                    expect(g.nodes[0].nodes[0].nodes[0].parentID()).toStrictEqual("foo.bar")
+                    expect(g.nodes[0].nodes[0].nodes[0].id()).toStrictEqual("foo/bar/baz")
+                    expect(g.nodes[0].nodes[0].nodes[0].parentID()).toStrictEqual("foo/bar")
                 })
             })
         })
@@ -113,11 +115,11 @@ describe("new Graph", () => {
                                 {name: "foo", type: "organisation"},
                                 {
                                     name: "bar", type: "organisation",
-                                    nodes: [{name: "baz.qux", type: "domain"}],
+                                    nodes: [{name: "baz/qux", type: "domain"}],
                                 },
                             ],
                             links: [
-                                {from: ".foo", to: "bar"},
+                                {from: "/foo", to: "bar"},
                             ]
                         },
                         wantErr: "unexpected link's 'from' id",
@@ -133,7 +135,7 @@ describe("new Graph", () => {
                                 },
                             ],
                             links: [
-                                {from: "baz..qux", to: "bar"},
+                                {from: "baz//qux", to: "bar"},
                             ]
                         },
                         wantErr: "unexpected link's 'from' id",
@@ -149,7 +151,7 @@ describe("new Graph", () => {
                                 },
                             ],
                             links: [
-                                {from: "foo.", to: "bar"},
+                                {from: "foo/", to: "bar"},
                             ]
                         },
                         wantErr: "unexpected link's 'from' id",
@@ -243,7 +245,7 @@ describe("new Graph", () => {
                             {name: "qux", type: "organisation", namespace: ""},
                         ],
                         links: [
-                            {from: "foo.bar.baz1", to: "qux"},
+                            {from: "foo/bar/baz1", to: "qux"},
                         ]
                     }
                     expect(() => {
@@ -282,7 +284,7 @@ describe("new Graph", () => {
                             {name: "qux", type: "organisation", namespace: ""},
                         ],
                         links: [
-                            {from: "foo.bar.baz", to: "quxx"},
+                            {from: "foo/bar/baz", to: "quxx"},
                         ]
                     }
                     expect(() => {
@@ -294,410 +296,34 @@ describe("new Graph", () => {
     })
 })
 
-const example_graph = {
-    nodes: [
-        {
-            name: "Foo", type: "organisation", nodes: [
-                {
-                    name: "DepartmentA", type: "department", nodes: [
-                        {
-                            name: "DomainA", type: "domain", nodes: [
-                                {
-                                    name: "Team0",
-                                    type: "team",
-                                    description: "backend",
-                                    nodes: [
-                                        {
-                                            name: "Service0", type: "service", nodes: [
-                                                {
-                                                    name: "App1",
-                                                    type: "application",
-                                                    technology: "Kotlin",
-                                                    deployment: "AWS EKS"
-                                                },
-                                                {
-                                                    name: "Database",
-                                                    type: "database",
-                                                    technology: "AWS Aurora Postgres",
-                                                },
-                                                {
-                                                    name: "Cache",
-                                                    type: "database",
-                                                    technology: "AWS Elasticache Redis",
-                                                },
-                                            ]
-                                        },
-                                        {
-                                            name: "Service1", type: "application",
-                                            technology: "Kotlin",
-                                            description: "application to run batch jobs on database",
-                                        },
-                                    ]
-                                },
-                                {
-                                    name: "Team1",
-                                    type: "team",
-                                    description: "frontend",
-                                    nodes: [
-                                        {
-                                            name: "Service2", type: "application",
-                                            technology: "JavaScript",
-                                            deployment: "AWS EKS",
-                                            description: "web application used by clients",
-                                        },
-                                    ]
-                                }
-                            ],
-                        },
-                        {
-                            name: "DomainB", type: "domain", nodes: [
-                                {
-                                    name: "Team2",
-                                    type: "team",
-                                    description: "analytics and reconciliation",
-                                    nodes: [
-                                        {
-                                            name: "Service3", type: "service", nodes: [
-                                                {
-                                                    name: "App",
-                                                    type: "application",
-                                                    description: "analytics",
-                                                    technology: "Python",
-                                                    deployment: "AWS EKS",
-                                                },
-                                                {
-                                                    name: "Database",
-                                                    type: "database",
-                                                    technology: "S3 Bucket"
-                                                },
-                                            ]
-                                        },
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                },
-                {
-                    name: "DepartmentB", type: "department", nodes: [
-                        {
-                            name: "Team3",
-                            type: "team",
-                            description: "streaming platform",
-                            nodes: [
-                                {
-                                    name: "Service4", type: "service", nodes: [
-                                        {
-                                            name: "App1",
-                                            description: "Streaming Platform",
-                                            type: "queue",
-                                            technology: "Kafka",
-                                            deployment: "AWS MSK",
-                                        },
-                                        {
-                                            name: "App2",
-                                            description: "Schema Registry",
-                                            type: "application",
-                                            technology: "AWS Glue Schema Registry"
-                                        },
-                                    ]
-                                },
-                                {
-                                    name: "Service5", type: "service", nodes: [
-                                        {
-                                            name: "App1",
-                                            description: "application to sync domain events data to datalake",
-                                            type: "application",
-                                            technology: "Go",
-                                            deployment: "AWS EKS",
-                                        },
-                                        {
-                                            name: "Database",
-                                            description: "Datalake",
-                                            type: "database",
-                                            technology: "S3 Bucket"
-                                        },
-                                    ]
-                                },
-                                {
-                                    name: "Service6",
-                                    type: "service",
-                                    description: "Secrets manager",
-                                    technology: "AWS Secretsmanager",
-                                },
-                            ]
-                        },
-                        {
-                            name: "Team4",
-                            type: "team",
-                            description: "CIAM",
-                            nodes: [
-                                {
-                                    name: "Service7",
-                                    type: "service",
-                                    description: "Mutates user's account",
-                                    technology: "Go",
-                                    deployment: "AWS EKS",
-                                },
-                                {
-                                    name: "Service8",
-                                    type: "service",
-                                    description: "IAM",
-                                    nodes: [
-                                        {
-                                            name: "IAM",
-                                            type: "application",
-                                            technology: "AWS Cognito",
-                                        },
-                                        {
-                                            name: "l0",
-                                            description: "Trigger 1",
-                                            type: "application",
-                                            technology: "Go",
-                                            deployment: "AWS Lambda",
-                                        },
-                                        {
-                                            name: "l1",
-                                            description: "Trigger 2",
-                                            type: "application",
-                                            technology: "Go",
-                                            deployment: "AWS Lambda",
-                                        },
-                                        {
-                                            name: "l2",
-                                            description: "Trigger 3",
-                                            type: "application",
-                                            technology: "Go",
-                                            deployment: "AWS Lambda",
-                                        },
-                                    ]
-                                },
-                                {
-                                    name: "Service9",
-                                    type: "service",
-                                    description: "Email notification service",
-                                    technology: "AWS SES",
-                                },
-                            ]
-                        }
-                    ]
-                },
-            ],
-        },
-    ],
-    links: [
-        {from: "Foo.DepartmentA.DomainA.Team0", to: "Foo.DepartmentB.Team3"},
-        {from: "Foo.DepartmentA.DomainA.Team0", to: "Foo.DepartmentB.Team4"},
-        {from: "Foo.DepartmentA.DomainA.Team1", to: "Foo.DepartmentA.DomainA.Team0"},
-        {from: "Foo.DepartmentA.DomainA.Team1", to: "Foo.DepartmentB.Team4"},
-        {from: "Foo.DepartmentA.DomainB.Team2", to: "Foo.DepartmentB.Team3"},
-        {from: "Foo.DepartmentB.Team4", to: "Foo.DepartmentB.Team3"},
-        {
-            from: "Foo.DepartmentA.DomainA.Team0.Service0",
-            to: "Foo.DepartmentB.Team3.Service4",
-            description: "Publishes and consumes domain events",
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team0.Service0",
-            to: "Foo.DepartmentB.Team3.Service6",
-            description: "Fetches authentication details",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team0.Service0",
-            to: "Foo.DepartmentB.Team4.Service8",
-            description: "Authenticates requests",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team0.Service0.App1",
-            to: "Foo.DepartmentA.DomainA.Team0.Service0.Database",
-            description: "Stores data",
-            technology: "sync, TCP/Postgres protocol"
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team0.Service0.App1",
-            to: "Foo.DepartmentA.DomainA.Team0.Service0.Cache",
-            description: "Caches responses",
-            technology: "sync, TCP/Redis protocol"
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team0.Service0.App1",
-            to: "Foo.DepartmentB.Team3.Service4.App1",
-            description: "Publishes and consumes domain events",
-            technology: "sync, TCP/AVRO"
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team0.Service0.App1",
-            to: "Foo.DepartmentB.Team3.Service4.App2",
-            description: "Fetches events schemas",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team0.Service0.App1",
-            to: "Foo.DepartmentB.Team3.Service6",
-            description: "Fetches authentication details",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team0.Service0.App1",
-            to: "Foo.DepartmentB.Team4.Service8.IAM",
-            description: "Authenticates requests",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team0.Service1",
-            to: "Foo.DepartmentA.DomainA.Team0.Service0.Database",
-            description: "Performs bulk operations",
-            technology: "sync, TCP/Postgres protocol"
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team1.Service2",
-            to: "Foo.DepartmentA.DomainA.Team0.Service0",
-            description: "Uses to process user's requests",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentA.DomainA.Team1.Service2",
-            to: "Foo.DepartmentB.Team4.Service8",
-            description: "Authenticates users",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentA.DomainB.Team2.Service3",
-            to: "Foo.DepartmentB.Team3.Service4",
-            description: "Publishes and consumes domain events"
-        },
-        {
-            from: "Foo.DepartmentA.DomainB.Team2.Service3",
-            to: "Foo.DepartmentB.Team3.Service6",
-            description: "Fetches authentication details",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentA.DomainB.Team2.Service3.App",
-            to: "Foo.DepartmentB.Team3.Service5.Database",
-            description: "Reads the data",
-            technology: "sync, HTTP/parquet"
-        },
-        {
-            from: "Foo.DepartmentA.DomainB.Team2.Service3.App",
-            to: "Foo.DepartmentB.Team3.Service4.App1",
-            description: "Publishes and consumes domain events",
-            technology: "sync, TCP/AVRO"
-        },
-        {
-            from: "Foo.DepartmentA.DomainB.Team2.Service3.App",
-            to: "Foo.DepartmentB.Team3.Service4.App2",
-            description: "Fetches events schemas",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentA.DomainB.Team2.Service3.App",
-            to: "Foo.DepartmentB.Team3.Service6",
-            description: "Fetches authentication details",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentA.DomainB.Team2.Service3.App",
-            to: "Foo.DepartmentA.DomainB.Team2.Service3.Database",
-            description: "Stores processed data",
-            technology: "sync, TCP/Postgres protocol"
-        },
-        {
-            from: "Foo.DepartmentB.Team3.Service5",
-            to: "Foo.DepartmentB.Team3.Service4",
-            description: "Consumes domain events"
-        },
-        {
-            from: "Foo.DepartmentB.Team3.Service5",
-            to: "Foo.DepartmentB.Team3.Service6",
-            description: "Fetches authentication details",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentB.Team3.Service5.App1",
-            to: "Foo.DepartmentB.Team3.Service4.App1",
-            description: "Consumes domain events",
-            technology: "sync, TCP/AVRO"
-        },
-        {
-            from: "Foo.DepartmentB.Team3.Service5.App1",
-            to: "Foo.DepartmentB.Team3.Service4.App2",
-            description: "Fetches events schemas",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentB.Team3.Service5.App1",
-            to: "Foo.DepartmentB.Team3.Service6",
-            description: "Fetches authentication details",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentB.Team3.Service5.App1",
-            to: "Foo.DepartmentB.Team3.Service5.Database",
-            description: "Stores data",
-            technology: "sync, HTTP/parquet"
-        },
-        {
-            from: "Foo.DepartmentB.Team4.Service8",
-            to: "Foo.DepartmentB.Team4.Service9",
-            description: "Uses to send emails to users"
-        },
-        {
-            from: "Foo.DepartmentB.Team4.Service8.IAM",
-            to: "Foo.DepartmentB.Team4.Service8.l0",
-            description: "Uses as trigger",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentB.Team4.Service8.IAM",
-            to: "Foo.DepartmentB.Team4.Service8.l1",
-            description: "Uses as trigger",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentB.Team4.Service8.IAM",
-            to: "Foo.DepartmentB.Team4.Service8.l2",
-            description: "Uses as trigger",
-            technology: "sync, HTTP/JSON"
-        },
-        {
-            from: "Foo.DepartmentB.Team4.Service8.l1",
-            to: "Foo.DepartmentB.Team4.Service9",
-            description: "Uses to send email to users"
-        },
-    ],
-};
-
 describe("Graph.serialiseToPlantUML", () => {
     const g = new Graph(example_graph);
 
     it("shall yield the diagram centered on Team0 with three links", () => {
-        expect(g.serialiseToPlantUML("Foo.DepartmentA.DomainA.Team0")).toEqual(`Enterprise_Boundary(Foo.DepartmentA.DomainA,"DomainA"){
-Component(Foo.DepartmentA.DomainA.Team0,"Team0","backend")
-Component_Ext(Foo.DepartmentA.DomainA.Team1,"Team1","frontend")
+        expect(g.serialiseToPlantUML("Foo/DepartmentA/DomainA/Team0")).toEqual(`Enterprise_Boundary(Foo/DepartmentA/DomainA,"DomainA"){
+Component(Foo/DepartmentA/DomainA/Team0,"Team0","backend")
+Component_Ext(Foo/DepartmentA/DomainA/Team1,"Team1","frontend")
 }
-Enterprise_Boundary(Foo.DepartmentB,"DepartmentB"){
-Component_Ext(Foo.DepartmentB.Team3,"Team3","streaming platform")
-Component_Ext(Foo.DepartmentB.Team4,"Team4","CIAM")
+Enterprise_Boundary(Foo/DepartmentB,"DepartmentB"){
+Component_Ext(Foo/DepartmentB/Team3,"Team3","streaming platform")
+Component_Ext(Foo/DepartmentB/Team4,"Team4","CIAM")
 }
-Rel(Foo.DepartmentA.DomainA.Team0,Foo.DepartmentB.Team3,"","")
-Rel(Foo.DepartmentA.DomainA.Team0,Foo.DepartmentB.Team4,"","")
-Rel(Foo.DepartmentA.DomainA.Team1,Foo.DepartmentA.DomainA.Team0,"","")`)
+Rel(Foo/DepartmentA/DomainA/Team0,Foo/DepartmentB/Team3,"","")
+Rel(Foo/DepartmentA/DomainA/Team0,Foo/DepartmentB/Team4,"","")
+Rel(Foo/DepartmentA/DomainA/Team1,Foo/DepartmentA/DomainA/Team0,"","")`)
     })
 
     it("shall yield the diagram centered on WebApplication two links", () => {
-        expect(g.serialiseToPlantUML("Foo.DepartmentA.DomainA.Team1.Service2")).toEqual(`Enterprise_Boundary(Foo.DepartmentA.DomainA.Team1,"Team1"){
-Container(Foo.DepartmentA.DomainA.Team1.Service2,"Service2","JavaScript/AWS EKS","web application used by clients")
+        expect(g.serialiseToPlantUML("Foo/DepartmentA/DomainA/Team1/Service2")).toEqual(`Enterprise_Boundary(Foo/DepartmentA/DomainA/Team1,"Team1"){
+Container(Foo/DepartmentA/DomainA/Team1/Service2,"Service2","JavaScript/AWS EKS","web application used by clients")
 }
-Enterprise_Boundary(Foo.DepartmentA.DomainA.Team0,"Team0"){
-System_Ext(Foo.DepartmentA.DomainA.Team0.Service0,"Service0","")
+Enterprise_Boundary(Foo/DepartmentA/DomainA/Team0,"Team0"){
+System_Ext(Foo/DepartmentA/DomainA/Team0/Service0,"Service0","")
 }
-Enterprise_Boundary(Foo.DepartmentB.Team4,"Team4"){
-System_Ext(Foo.DepartmentB.Team4.Service8,"Service8","IAM")
+Enterprise_Boundary(Foo/DepartmentB/Team4,"Team4"){
+System_Ext(Foo/DepartmentB/Team4/Service8,"Service8","IAM")
 }
-Rel(Foo.DepartmentA.DomainA.Team1.Service2,Foo.DepartmentA.DomainA.Team0.Service0,"Uses to process user's requests","sync, HTTP/JSON")
-Rel(Foo.DepartmentA.DomainA.Team1.Service2,Foo.DepartmentB.Team4.Service8,"Authenticates users","sync, HTTP/JSON")`)
+Rel(Foo/DepartmentA/DomainA/Team1/Service2,Foo/DepartmentA/DomainA/Team0/Service0,"Uses to process user's requests","sync, HTTP/JSON")
+Rel(Foo/DepartmentA/DomainA/Team1/Service2,Foo/DepartmentB/Team4/Service8,"Authenticates users","sync, HTTP/JSON")`)
     })
 })
