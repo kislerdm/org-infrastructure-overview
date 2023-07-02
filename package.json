@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@vitest/coverage-c8": "^0.32.2",
     "@vitest/coverage-v8": "^0.32.2",
+    "@vitest/utils": "^0.32.2",
     "jsdom": "^22.1.0",
+    "terser": "^5.18.2",
     "typescript": "^5.0.2",
     "vite": "^4.3.9",
     "vitest": "^0.32.2"

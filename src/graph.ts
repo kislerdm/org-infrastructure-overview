@@ -91,7 +91,7 @@ export default class Graph {
     }
 }
 
-declare interface Node {
+export interface Node {
     /**
      * Human friendly node's name.
      */

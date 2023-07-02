@@ -1,4 +1,5 @@
-import {defineConfig} from 'vite'
+import {defineConfig} from 'vite';
+import {parseRegexp} from '@vitest/utils';
 
 export default defineConfig({
     base: "./",
@@ -14,6 +15,12 @@ export default defineConfig({
         globals: true,
         environment: "jsdom",
         include: ["./test/**/*.{ts,js}"],
+        css: {
+            include: parseRegexp("src\/(.*)css"),
+            modules: {
+                classNameStrategy: "non-scoped",
+            },
+        },
         coverage: {
             all: true,
             provider: "c8",
