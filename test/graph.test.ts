@@ -492,8 +492,6 @@ const example_graph = {
         {from: "Foo.DepartmentA.DomainA.Team1", to: "Foo.DepartmentB.Team4"},
         {from: "Foo.DepartmentA.DomainB.Team2", to: "Foo.DepartmentB.Team3"},
         {from: "Foo.DepartmentB.Team4", to: "Foo.DepartmentB.Team3"},
-
-        // Service0
         {
             from: "Foo.DepartmentA.DomainA.Team0.Service0",
             to: "Foo.DepartmentB.Team3.Service4",
@@ -547,16 +545,12 @@ const example_graph = {
             description: "Authenticates requests",
             technology: "sync, HTTP/JSON"
         },
-
-        // Service1
         {
             from: "Foo.DepartmentA.DomainA.Team0.Service1",
             to: "Foo.DepartmentA.DomainA.Team0.Service0.Database",
             description: "Performs bulk operations",
             technology: "sync, TCP/Postgres protocol"
         },
-
-        // Service2
         {
             from: "Foo.DepartmentA.DomainA.Team1.Service2",
             to: "Foo.DepartmentA.DomainA.Team0.Service0",
@@ -569,8 +563,6 @@ const example_graph = {
             description: "Authenticates users",
             technology: "sync, HTTP/JSON"
         },
-
-        // Service3
         {
             from: "Foo.DepartmentA.DomainB.Team2.Service3",
             to: "Foo.DepartmentB.Team3.Service4",
@@ -612,8 +604,6 @@ const example_graph = {
             description: "Stores processed data",
             technology: "sync, TCP/Postgres protocol"
         },
-
-        // Service5
         {
             from: "Foo.DepartmentB.Team3.Service5",
             to: "Foo.DepartmentB.Team3.Service4",
@@ -649,8 +639,6 @@ const example_graph = {
             description: "Stores data",
             technology: "sync, HTTP/parquet"
         },
-
-        // Service8
         {
             from: "Foo.DepartmentB.Team4.Service8",
             to: "Foo.DepartmentB.Team4.Service9",

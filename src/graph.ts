@@ -91,7 +91,7 @@ export default class Graph {
     }
 }
 
-interface Node {
+declare interface Node {
     /**
      * Human friendly node's name.
      */
@@ -201,6 +201,12 @@ class node {
                         tech = this.deployment!;
                     }
                 }
+
+                // TODO: remove the condition when the https://github.com/mermaid-js/mermaid/issues/4576 is resolved
+                if (this.type == Type.Queue && externalPrefix != "") {
+                    return `Container${externalPrefix}(${this._id},"${this.name}","${tech}","${this.description}")`;
+                }
+
                 return `Container${containerSuffix(this.type)}${externalPrefix}(${this._id},"${this.name}","${tech}","${this.description}")`;
             case Type.Team:
             case Type.Organisation:
@@ -230,7 +236,7 @@ enum Type {
 /**
  * Connection between two Nodes, i.e. graph's edge.
  */
-interface Link {
+declare interface Link {
     /**
      * Edge start's Node id.
      */
