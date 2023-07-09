@@ -1,45 +1,58 @@
 import './style.css';
 import Graph, {Node} from './graph.ts';
-import diagramRawDefinition from './data.json';
-import {C4DiagramBuilderMermaid, DiagramBuilder} from "./diagram.ts";
+import {DiagramBuilder} from "./diagram.ts";
 
-function Main(root: HTMLDivElement, builder: DiagramBuilder, route: string, data: object): void {
+
+function Input(id: string, nodes: Node[]): string {
+    return `<form class="tree" id="intputForm"><ul><li><input class="custom-control-input" type="radio" checked="" name="tree" id="Foo" value="Foo"><label class="custom-control-label" for="Foo">Foo</label></li></ul></form>`
+}
+
+export default async function Main(mountPoint: HTMLDivElement, builder: DiagramBuilder, route: string, data: object): Promise<void> {
     let d: Graph;
     try {
         d = new Graph(data);
         // @ts-ignore
     } catch (err: Error) {
         console.error(err.message);
-        root.innerHTML = `<div class="alert">Error<div style="color:#000">${err.message}</div>`
+        mountPoint.innerHTML = `<div class="alert">Error<div style="color:#000">${err.message}</div>`
+        return;
     }
 
-    // @ts-ignore
-    const id = route !== "" ? route : d.nodes[0].id();
+    let id: string = "";
+    try {
+        id = route !== "" ? route : d.nodes[0].id();
+        // @ts-ignore
+        const diagramDefinition = d.serialiseToPlantUML(id);
+        // @ts-ignore
+        const svg = await builder.renderSVG(diagramDefinition);
 
-    function twoColsPage(nodes: Node[], svg: string) {
-        return `<div class="row"><div class="column left"></div><div class="column right">${svg }</div></div>`;
+        mountPoint.innerHTML = `<div class="row">
+    <div class="column left"><div id="input" class="ninotree custom-control custom-radio">${Input(id, d.nodes)}</div></div>
+    <div class="column right"><div id="output">${svg}</div></div>
+</div>`;
+        // @ts-ignore
+    } catch (err: Error) {
+        console.error(err.message);
+        mountPoint.innerHTML = `<div class="alert">Error<div style="color:#000">Diagram rendering error. Node ID: ${id}\n${err.message}</div>`;
+        return;
     }
 
-    // @ts-ignore
-    builder.renderSVG(d.serialiseToPlantUML(id))
-        .then(svg => {
-            root.innerHTML = twoColsPage(d.nodes, svg);
-        })
-        .catch((err: Error) => {
-            console.error(err.message);
-            root.innerHTML = `<div class="alert">Error<div style="color:#000">Diagram rendering error</div>`
-        });
+    // const output = findDivElementByID(mountPoint.getElementsByClassName("form")[0]!, "inputForm")!;
+    // output.addEventListener("click", (e) => {
+    //     const el = e.srcElement;
+    //     // @ts-ignore
+    //     if (el.classList.contains("custom-control-input")) {
+    //         // @ts-ignore
+    //         console.log(el.id);
+    //     }
+    // });
 }
 
-function router(): string {
-    const o = decodeURI(window.location.href.replace(window.location.origin, "").slice(1))
-    if (o.endsWith("/")) {
-        window.location.replace(window.location.toString().slice(0, -1));
-        return o.slice(0, -1);
+export function findFistAppeadDivElementByID(mountPoint: Element, id: string): HTMLElement | undefined {
+    for (const el of mountPoint.getElementsByTagName("div")) {
+        if (el.id == id) {
+            return el;
+        }
     }
-    return o;
+    return undefined;
 }
-
-const root = document.querySelector<HTMLDivElement>('#app')!;
-
-Main(root, new C4DiagramBuilderMermaid(root), router(), diagramRawDefinition);

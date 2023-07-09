@@ -1,4 +1,4 @@
-import mermaid from "mermaid";
+import mermaid, {RenderResult} from "mermaid";
 
 export declare interface DiagramBuilder {
     /**
@@ -10,30 +10,40 @@ export declare interface DiagramBuilder {
     renderSVG(definition: string): Promise<string>
 }
 
+export interface C4Renderer {
+    render(id: string, text: string, container?: Element): Promise<RenderResult>
+}
+
 export class C4DiagramBuilderMermaid {
     private readonly div_id: HTMLDivElement;
+    private client: C4Renderer;
 
-    constructor(div_id: HTMLDivElement) {
-        mermaid.initialize({
-            theme: "default",
-            dompurifyConfig: {
-                USE_PROFILES: {
-                    svg: true,
+    constructor(div_id: HTMLDivElement, client: C4Renderer | undefined = undefined) {
+        if (client === undefined) {
+            mermaid.initialize({
+                theme: "default",
+                dompurifyConfig: {
+                    USE_PROFILES: {
+                        svg: true,
+                    },
                 },
-            },
-            startOnLoad: true,
-            htmlLabels: true,
-        })
+                startOnLoad: true,
+                htmlLabels: true,
+            })
+            this.client = mermaid;
+        } else {
+            this.client = client!;
+        }
         this.div_id = div_id;
     }
 
     async renderSVG(definition: string): Promise<string> {
-        const prefix = "C4Container";
+        const prefix: string = "C4Container";
         definition = definition.trimStart()
         if (!definition.startsWith(prefix)) {
             definition = `${prefix}\n${definition}`
         }
-        const {svg} = await mermaid.render("diagram", definition, this.div_id);
+        const {svg} = await this.client.render("diagram", definition, this.div_id);
         return svg;
     }
 }

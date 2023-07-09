@@ -41,3 +41,26 @@
     display: table;
     clear: both;
 }
+
+div.ninotree{
+    margin: 0;
+    padding: 0;
+}
+
+div.ninotree ul{
+    list-style-type: none;
+}
+
+div.ninotree label{
+    margin-left: 1.8em;
+    user-select: none;
+}
+
+div.ninotree .caret {
+    cursor: pointer;
+    user-select: none;
+}
+
+div.ninotree .collapsed{
+    display: none;
+}
