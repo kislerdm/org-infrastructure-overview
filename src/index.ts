@@ -12,17 +12,5 @@ function router(): string {
 }
 
 const root = document.querySelector<HTMLDivElement>('#app')!;
-const diagramDiv = document.createElement("div");
-root.appendChild(diagramDiv);
-
-// TODO: replace test data
-// const diagramRawDefinition = {
-//     nodes: [
-//         {
-//             name: "Foo",
-//             type: "organisation",
-//         },
-//     ],
-// }
 
 Main(root, new C4DiagramBuilderMermaid(), router(), diagramRawDefinition);

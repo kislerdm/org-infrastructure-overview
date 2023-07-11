@@ -29,6 +29,10 @@ function Input(nodes: Node[], id: string): string {
     return `<form class="tree" id="intputForm">${generateList(nodes, id)}</form>`
 }
 
+function errorMessage(msg: string): string {
+    return `<div class="alert">Error<div style="color:#000">${msg}</div>`;
+}
+
 export default async function Main(mountPoint: HTMLDivElement, builder: DiagramBuilder, route: string, data: object): Promise<void> {
     let d: Graph;
     try {
@@ -36,16 +40,15 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
         // @ts-ignore
     } catch (err: Error) {
         console.error(err.message);
-        mountPoint.innerHTML = `<div class="alert">Error<div style="color:#000">${err.message}</div>`
+        mountPoint.innerHTML = errorMessage(err.message);
         return;
     }
 
-    let id: string = route !== "" ? route : d.nodes[0].id();
+    const id: string = route !== "" ? route : d.nodes[0].id();
+
     try {
         // @ts-ignore
-        const diagramDefinition = d.serialiseToPlantUML(id);
-        // @ts-ignore
-        const svg = await builder.renderSVG(diagramDefinition);
+        const svg = await builder.renderSVG(d.serialiseToPlantUML(id), mountPoint);
 
         mountPoint.innerHTML = `<div class="row">
     <div class="column left"><div id="input" class="ninotree custom-control custom-radio">${Input(d.nodes, id)}</div></div>
@@ -54,7 +57,7 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
         // @ts-ignore
     } catch (err: Error) {
         console.error(err.message);
-        mountPoint.innerHTML = `<div class="alert">Error<div style="color:#000">Diagram rendering error. Node ID: ${id}\n${err.message}</div>`;
+        mountPoint.innerHTML = errorMessage(`Diagram rendering error. Node ID: ${id}\n${err.message}`);
         return;
     }
 
@@ -85,7 +88,7 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
                     // @ts-ignore
                 } catch (err: Error) {
                     console.error(err.message);
-                    mountPoint.innerHTML = `<div class="alert">Error<div style="color:#000">Diagram rendering error. Node ID: ${id}\n${err.message}</div>`;
+                    mountPoint.innerHTML = errorMessage(`Diagram rendering error. Node ID: ${id}\n${err.message}`);
                 }
             }
         }
