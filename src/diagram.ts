@@ -5,20 +5,20 @@ export declare interface DiagramBuilder {
      * Renders the diagram as SVG.
      *
      * @param definition(string): Diagram definition.
+     * @param container(Element): DOM element to use for rendering.
      * @return Promise with the rendered diagram as SVG.
      * */
-    renderSVG(definition: string): Promise<string>
+    renderSVG(definition: string, container?: Element): Promise<string>
 }
 
 export interface C4Renderer {
     render(id: string, text: string, container?: Element): Promise<RenderResult>
 }
 
-export class C4DiagramBuilderMermaid {
-    private readonly div_id: HTMLDivElement;
-    private client: C4Renderer;
+export class C4DiagramBuilderMermaid implements DiagramBuilder {
+    private client?: C4Renderer = undefined;
 
-    constructor(div_id: HTMLDivElement, client: C4Renderer | undefined = undefined) {
+    constructor(client?: C4Renderer) {
         if (client === undefined) {
             mermaid.initialize({
                 theme: "default",
@@ -32,18 +32,17 @@ export class C4DiagramBuilderMermaid {
             })
             this.client = mermaid;
         } else {
-            this.client = client!;
+            this.client = client;
         }
-        this.div_id = div_id;
     }
 
-    async renderSVG(definition: string): Promise<string> {
+    async renderSVG(definition: string, container?: Element): Promise<string> {
         const prefix: string = "C4Container";
         definition = definition.trimStart()
         if (!definition.startsWith(prefix)) {
             definition = `${prefix}\n${definition}`
         }
-        const {svg} = await this.client.render("diagram", definition, this.div_id);
+        const {svg} = await this.client!.render("diagram", definition, container);
         return svg;
     }
 }

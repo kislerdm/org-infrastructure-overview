@@ -1,5 +1,5 @@
 import {C4DiagramBuilderMermaid} from "./diagram.ts";
-// import diagramRawDefinition from "./data.json";
+import diagramRawDefinition from "./data.json";
 import Main from "./main.ts";
 
 function router(): string {
@@ -16,13 +16,13 @@ const diagramDiv = document.createElement("div");
 root.appendChild(diagramDiv);
 
 // TODO: replace test data
-const diagramRawDefinition = {
-    nodes: [
-        {
-            name: "Foo",
-            type: "organisation",
-        },
-    ],
-}
+// const diagramRawDefinition = {
+//     nodes: [
+//         {
+//             name: "Foo",
+//             type: "organisation",
+//         },
+//     ],
+// }
 
-Main(root, new C4DiagramBuilderMermaid(diagramDiv), router(), diagramRawDefinition);
+Main(root, new C4DiagramBuilderMermaid(), router(), diagramRawDefinition);

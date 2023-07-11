@@ -40,9 +40,8 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
         return;
     }
 
-    let id: string = "";
+    let id: string = route !== "" ? route : d.nodes[0].id();
     try {
-        id = route !== "" ? route : d.nodes[0].id();
         // @ts-ignore
         const diagramDefinition = d.serialiseToPlantUML(id);
         // @ts-ignore
@@ -59,18 +58,41 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
         return;
     }
 
-    // const output = findDivElementByID(mountPoint.getElementsByClassName("form")[0]!, "inputForm")!;
-    // output.addEventListener("click", (e) => {
-    //     const el = e.srcElement;
-    //     // @ts-ignore
-    //     if (el.classList.contains("custom-control-input")) {
-    //         // @ts-ignore
-    //         console.log(el.id);
-    //     }
-    // });
+    // register caret
+    const carets = mountPoint.getElementsByClassName('caret');
+    for (const caret of carets) {
+        caret.addEventListener('click', () => {
+            // @ts-ignore
+            caret.parentElement.querySelector('ul').classList.toggle('collapsed');
+            caret.classList.toggle('fa-caret-right');
+            caret.classList.toggle('fa-caret-down');
+        });
+    }
+
+    const tree = mountPoint.getElementsByClassName("tree")[0]!;
+    tree.addEventListener("click", async (e: Event): Promise<void> => {
+            const srcElement = e.srcElement!;
+
+            // @ts-ignore
+            if (srcElement.classList.contains("custom-control-input")) {
+                try {
+                    const el = findFistDivElementByID(
+                        mountPoint.getElementsByClassName("column right")[0]!, "output")!;
+
+                    // @ts-ignore
+                    el.innerHTML = await builder.renderSVG(d.serialiseToPlantUML(srcElement.id), el);
+
+                    // @ts-ignore
+                } catch (err: Error) {
+                    console.error(err.message);
+                    mountPoint.innerHTML = `<div class="alert">Error<div style="color:#000">Diagram rendering error. Node ID: ${id}\n${err.message}</div>`;
+                }
+            }
+        }
+    );
 }
 
-export function findFistAppeadDivElementByID(mountPoint: Element, id: string): HTMLElement | undefined {
+export function findFistDivElementByID(mountPoint: Element, id: string): Element | undefined {
     for (const el of mountPoint.getElementsByTagName("div")) {
         if (el.id == id) {
             return el;

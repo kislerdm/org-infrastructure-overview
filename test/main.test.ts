@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import {beforeEach, describe, expect, test} from "vitest";
 import {JSDOM} from "jsdom";
-import Main, {findFistAppeadDivElementByID} from "../src/main";
+import Main, {findFistDivElementByID} from "../src/main";
 import {DiagramBuilder} from "../src/diagram";
 
 
@@ -34,7 +34,7 @@ describe.each([
 
     test(`returns ${want}`, () => {
         // @ts-ignore
-        const got = findFistAppeadDivElementByID(mountPoint, id);
+        const got = findFistDivElementByID(mountPoint, id);
         expect(wantDom).toEqual(got);
     })
 })

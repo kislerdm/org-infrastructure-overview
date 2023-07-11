@@ -23,8 +23,8 @@ class mockC4Render implements C4Renderer {
 describe("C4DiagramBuilderMermaid", () => {
     it("shall generate svg of a single container", async () => {
         const root = new JSDOM(`<div id="app"></div>`).window.document.querySelector<HTMLDivElement>("#app")!;
-        const builder = new C4DiagramBuilderMermaid(root, new mockC4Render("<svg>foo</svg>"));
-        const svg = await builder.renderSVG(`Container(foo,"Foo")`);
+        const builder = new C4DiagramBuilderMermaid(new mockC4Render("<svg>foo</svg>"));
+        const svg = await builder.renderSVG(`Container(foo,"Foo")`, root);
         expect(svg).toMatch("<svg>");
     })
 })
