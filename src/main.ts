@@ -2,7 +2,6 @@ import './style.css';
 import Graph, {Node} from './graph.ts';
 import {DiagramBuilder} from "./diagram.ts";
 
-
 function Input(nodes: Node[], id: string): string {
     function generateList(nodes: Node[], selected_id: string): string {
         if (nodes.length == 0) {
@@ -14,12 +13,12 @@ function Input(nodes: Node[], id: string): string {
         for (const node of nodes) {
             const checked: string = node.id() == selected_id ? "checked" : "";
             const listRow: string = `<input class="custom-control-input" type="radio" name="tree" id="${node.id()}" value="${node.id()}" ${checked}><label class="custom-control-label" for="${node.id()}">${node.name}</label>`;
-            const dropDownBtn: string = `<i class="caret fas fa-caret-down"></i>`;
+            const dropDownBtn: string = `<i class="fas fa-caret-down caret"></i>`;
 
             if (node.nodes != undefined && node.nodes.length > 0) {
-                o += `<li>${dropDownBtn}${listRow}${generateList(node.nodes, selected_id)}</li>`
+                o += `<li xmlns="http://www.w3.org/1999/html"><span></span></spab>${dropDownBtn}${listRow}${generateList(node.nodes, selected_id)}</span></li>`
             } else {
-                o += `<li>${listRow}</li>`
+                o += `<li><span>${listRow}</span></li>`
             }
         }
 

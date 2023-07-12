@@ -29,11 +29,11 @@
 }
 
 .left {
-    width: 15%;
+    width: 30%;
 }
 
 .right {
-    width: 85%;
+    width: 70%;
 }
 
 .row:after {
@@ -63,4 +63,17 @@ div.ninotree .caret {
 
 div.ninotree .collapsed{
     display: none;
+}
+
+.caret {
+    font-weight: bold;
+    font-style: normal;
+}
+
+.fa-caret-down:before {
+    content: "-"
+}
+
+.fa-caret-right:before {
+    content: "+"
 }
