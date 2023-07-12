@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import {beforeEach, describe, expect, test} from "vitest";
+import {beforeEach, describe, expect, it, test} from "vitest";
 import {JSDOM} from "jsdom";
 import Main, {findFistDivElementByID} from "../src/main";
 import {DiagramBuilder} from "../src/diagram";
@@ -41,11 +41,9 @@ describe.each([
 
 
 class mockDiagramBuilder implements DiagramBuilder {
-    err: Error | undefined
-    svg: string | undefined
+    err?: Error = undefined
 
-    constructor(svg: string | undefined, err: Error | undefined) {
-        this.svg = svg;
+    constructor(err?: Error) {
         this.err = err;
     }
 
@@ -53,7 +51,7 @@ class mockDiagramBuilder implements DiagramBuilder {
         if (this.err != undefined) {
             return Promise.reject(this.err);
         }
-        return Promise.resolve(this.svg);
+        return Promise.resolve(`<svg>${s}</svg>`);
     }
 }
 
@@ -69,12 +67,12 @@ describe.each([
                     },
                 ],
             },
-            builder: new mockDiagramBuilder(`<svg>Foo</svg>`, undefined),
+            builder: new mockDiagramBuilder(),
             route: "",
         },
         want: `<div class="row">
     <div class="column left"><div id="input" class="ninotree custom-control custom-radio"><form class="tree" id="intputForm"><ul><li><input class="custom-control-input" type="radio" name="tree" id="Foo" value="Foo" checked=""><label class="custom-control-label" for="Foo">Foo</label></li></ul></form></div></div>
-    <div class="column right"><div id="output"><svg>Foo</svg></div></div>
+    <div class="column right"><div id="output"><svg>Component(Foo,"Foo","")\n</svg></div></div>
 </div>`,
     },
     {
@@ -100,12 +98,12 @@ describe.each([
                     },
                 ],
             },
-            builder: new mockDiagramBuilder(`<svg>Foo</svg>`, undefined),
+            builder: new mockDiagramBuilder(),
             route: "",
         },
         want: `<div class="row">
     <div class="column left"><div id="input" class="ninotree custom-control custom-radio"><form class="tree" id="intputForm"><ul><li><i class="caret fas fa-caret-down"></i><input class="custom-control-input" type="radio" name="tree" id="Foo" value="Foo" checked=""><label class="custom-control-label" for="Foo">Foo</label><ul><li><i class="caret fas fa-caret-down"></i><input class="custom-control-input" type="radio" name="tree" id="Foo/Bar" value="Foo/Bar"><label class="custom-control-label" for="Foo/Bar">Bar</label><ul><li><input class="custom-control-input" type="radio" name="tree" id="Foo/Bar/Baz" value="Foo/Bar/Baz"><label class="custom-control-label" for="Foo/Bar/Baz">Baz</label></li></ul></li></ul></li></ul></form></div></div>
-    <div class="column right"><div id="output"><svg>Foo</svg></div></div>
+    <div class="column right"><div id="output"><svg>Component(Foo,"Foo","")\n</svg></div></div>
 </div>`,
     },
     {
@@ -118,7 +116,7 @@ describe.each([
                     },
                 ],
             },
-            builder: new mockDiagramBuilder(`<svg>Foo</svg>`, undefined),
+            builder: new mockDiagramBuilder(),
             route: "",
         },
         want: `<div class="alert">Error<div style="color:#000">Invalid value for key "name" on Node. Expected string but got undefined</div></div>`,
@@ -134,7 +132,7 @@ describe.each([
                     },
                 ],
             },
-            builder: new mockDiagramBuilder(undefined, new Error("foo")),
+            builder: new mockDiagramBuilder(new Error("foo")),
             route: "",
         },
         want: `<div class="alert">Error<div style="color:#000">Diagram rendering error. Node ID: Foo\nfoo</div></div>`,
@@ -152,3 +150,57 @@ describe.each([
         expect(mountPoint.innerHTML).toEqual(want);
     })
 })
+
+// TODO: fix the test:
+// GIVEN
+//  Correct logic
+// WHEN
+//  The radio button in the selector tree is clicked
+// THEN
+//  The diagram is redrawn
+// describe("Main select node in the input panel", () => {
+//     let doc: Document,
+//         mountPoint: HTMLDivElement
+//
+//     beforeEach(() => {
+//         doc = new JSDOM(`<div id="app"></div>`, {
+//             url: window.location,
+//             // runScripts: "dangerously",
+//         }).window.document;
+//         mountPoint = doc.querySelector<HTMLDivElement>("#app")!;
+//     })
+//
+//     it("shall redraw diagram for the node Bar given two nodes, Foo and Bar with Foo default", async () => {
+//         const input = {
+//             data: {
+//                 nodes: [
+//                     {
+//                         name: "Foo",
+//                         type: "organisation",
+//                     },
+//                     {
+//                         name: "Bar",
+//                         type: "organisation",
+//                     },
+//                 ],
+//             },
+//             builder: new mockDiagramBuilder(),
+//             route: "",
+//         }
+//         const want: string = `<div class="row">
+//     <div class="column left"><div id="input" class="ninotree custom-control custom-radio"><form class="tree" id="intputForm"><ul><li><input class="custom-control-input" type="radio" name="tree" id="Foo" value="Foo"><label class="custom-control-label" for="Foo">Foo</label></li><li><input class="custom-control-input" type="radio" name="tree" id="Bar" value="Bar" checked=""><label class="custom-control-label" for="Bar">Bar</label></li></ul></form></div></div>
+//     <div class="column right"><div id="output"><svg>Component(Bar,"Bar","")\n</svg></div></div>
+// </div>`;
+//
+//         await Main(mountPoint, input.builder, input.route, input.data);
+//
+//         // @ts-ignore
+//         for (const inputBtn of mountPoint.getElementsByClassName("custom-control-input")) {
+//             if (inputBtn.id == "Bar") {
+//                 inputBtn.dispatchEvent(new Event("click"));
+//             }
+//         }
+//
+//         expect(mountPoint.innerHTML).toEqual(want);
+//     })
+// })

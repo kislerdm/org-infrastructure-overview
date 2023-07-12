@@ -61,6 +61,26 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
         return;
     }
 
+    // input selector to focus the diagram on specific node
+    for (const elInput of mountPoint.getElementsByClassName("custom-control-input")) {
+        elInput.addEventListener("click", async (e: Event): Promise<void> => {
+            // @ts-ignore
+            const id = e.target!.id
+            try {
+                const el = findFistDivElementByID(
+                    mountPoint.getElementsByClassName("column right")[0]!, "output")!;
+
+                // @ts-ignore
+                el.innerHTML = await builder.renderSVG(d.serialiseToPlantUML(id), el);
+
+                // @ts-ignore
+            } catch (err: Error) {
+                console.error(err.message);
+                mountPoint.innerHTML = errorMessage(`Diagram rendering error. Node ID: ${id}\n${err.message}`);
+            }
+        })
+    }
+
     // register caret
     const carets = mountPoint.getElementsByClassName('caret');
     for (const caret of carets) {
@@ -71,28 +91,6 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
             caret.classList.toggle('fa-caret-down');
         });
     }
-
-    const tree = mountPoint.getElementsByClassName("tree")[0]!;
-    tree.addEventListener("click", async (e: Event): Promise<void> => {
-            const srcElement = e.srcElement!;
-
-            // @ts-ignore
-            if (srcElement.classList.contains("custom-control-input")) {
-                try {
-                    const el = findFistDivElementByID(
-                        mountPoint.getElementsByClassName("column right")[0]!, "output")!;
-
-                    // @ts-ignore
-                    el.innerHTML = await builder.renderSVG(d.serialiseToPlantUML(srcElement.id), el);
-
-                    // @ts-ignore
-                } catch (err: Error) {
-                    console.error(err.message);
-                    mountPoint.innerHTML = errorMessage(`Diagram rendering error. Node ID: ${id}\n${err.message}`);
-                }
-            }
-        }
-    );
 }
 
 export function findFistDivElementByID(mountPoint: Element, id: string): Element | undefined {
