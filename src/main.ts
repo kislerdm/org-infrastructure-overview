@@ -2,6 +2,8 @@ import './style.css';
 import Graph, {Node} from './graph.ts';
 import {DiagramBuilder} from "./diagram.ts";
 
+const inputSelectedIdStyle: string = "font-weight:bold;font-size:18px";
+
 function Input(nodes: Node[], id: string): string {
     function generateList(nodes: Node[], selected_id: string): string {
         if (nodes.length == 0) {
@@ -11,14 +13,15 @@ function Input(nodes: Node[], id: string): string {
         let o: string = "<ul>";
 
         for (const node of nodes) {
-            const checked: string = node.id() == selected_id ? "checked" : "";
-            const listRow: string = `<input class="custom-control-input" type="radio" name="tree" id="${node.id()}" value="${node.id()}" ${checked}><label class="custom-control-label" for="${node.id()}">${node.name}</label>`;
-            const dropDownBtn: string = `<i class="fas fa-caret-down caret"></i>`;
+            const checked: string = node.id() == selected_id ? `style=${inputSelectedIdStyle}` : "";
+            const listRow: string =
+                `<span class="custom-control-input" id="${node.id()}" ${checked}>${node.name}</span>`;
+            const dropDownSelection: string = `<span class="caret minimize"></span>`;
 
             if (node.nodes != undefined && node.nodes.length > 0) {
-                o += `<li xmlns="http://www.w3.org/1999/html"><span></span></spab>${dropDownBtn}${listRow}${generateList(node.nodes, selected_id)}</span></li>`
+                o += `<li>${dropDownSelection}${listRow}${generateList(node.nodes, selected_id)}</li>`
             } else {
-                o += `<li><span>${listRow}</span></li>`
+                o += `<li><span class="fixed"></span>${listRow}</li>`
             }
         }
 
@@ -32,7 +35,9 @@ function errorMessage(msg: string): string {
     return `<div class="alert">Error<div style="color:#000">${msg}</div>`;
 }
 
-export default async function Main(mountPoint: HTMLDivElement, builder: DiagramBuilder, route: string, data: object): Promise<void> {
+export default async function Main(
+    mountPoint: HTMLDivElement, builder: DiagramBuilder, route: string, data: object
+): Promise<void> {
     let d: Graph;
     try {
         d = new Graph(data);
@@ -50,7 +55,7 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
         const svg = await builder.renderSVG(d.serialiseToPlantUML(id), mountPoint);
 
         mountPoint.innerHTML = `<div class="row">
-    <div class="column left"><div id="input" class="ninotree custom-control custom-radio">${Input(d.nodes, id)}</div></div>
+    <div class="column left"><div id="input" class="tree-panel">${Input(d.nodes, id)}</div></div>
     <div class="column right"><div id="output">${svg}</div></div>
 </div>`;
         // @ts-ignore
@@ -60,8 +65,22 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
         return;
     }
 
+    function resetDefaultStyleInputElement(id: string): void {
+        for (const el of inputElements) {
+            // @ts-ignore
+            if (el.id === id) {
+                el.setAttribute("style", "")
+            }
+        }
+    }
+
+    let prevSelectedId: string = id;
+
     // input selector to focus the diagram on specific node
-    for (const elInput of mountPoint.getElementsByClassName("custom-control-input")) {
+    const inputElements = mountPoint
+        .getElementsByClassName("custom-control-input");
+
+    for (const elInput of inputElements) {
         elInput.addEventListener("click", async (e: Event): Promise<void> => {
             // @ts-ignore
             const id = e.target!.id
@@ -77,6 +96,11 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
                 console.error(err.message);
                 mountPoint.innerHTML = errorMessage(`Diagram rendering error. Node ID: ${id}\n${err.message}`);
             }
+
+            resetDefaultStyleInputElement(prevSelectedId);
+            // @ts-ignore
+            elInput.setAttribute("style", inputSelectedIdStyle);
+            prevSelectedId = id
         })
     }
 
@@ -86,8 +110,8 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
         caret.addEventListener('click', () => {
             // @ts-ignore
             caret.parentElement.querySelector('ul').classList.toggle('collapsed');
-            caret.classList.toggle('fa-caret-right');
-            caret.classList.toggle('fa-caret-down');
+            caret.classList.toggle('maximize');
+            caret.classList.toggle('minimize');
         });
     }
 }

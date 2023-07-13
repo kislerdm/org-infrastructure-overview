@@ -42,38 +42,41 @@
     clear: both;
 }
 
-div.ninotree{
+.tree-panel {
     margin: 0;
     padding: 0;
 }
 
-div.ninotree ul{
+.tree-panel ul {
     list-style-type: none;
 }
 
-div.ninotree label{
-    margin-left: 1.8em;
-    user-select: none;
-}
-
-div.ninotree .caret {
+.tree-panel .caret,
+.tree-panel .custom-control-input {
     cursor: pointer;
     user-select: none;
 }
 
-div.ninotree .collapsed{
+.tree-panel .collapsed {
     display: none;
 }
 
 .caret {
-    font-weight: bold;
     font-style: normal;
+    font-size: 20px;
+    margin-right: 10px;
 }
 
-.fa-caret-down:before {
-    content: "-"
+.minimize:before {
+    content: "-";
+    margin-right: 3px;
 }
 
-.fa-caret-right:before {
-    content: "+"
+.maximize:before {
+    content: "+";
+}
+
+.fixed:before {
+    content: "*";
+    margin-right: 15px;
 }

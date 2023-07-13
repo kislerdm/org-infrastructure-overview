@@ -71,7 +71,7 @@ describe.each([
             route: "",
         },
         want: `<div class="row">
-    <div class="column left"><div id="input" class="ninotree custom-control custom-radio"><form class="tree" id="intputForm"><ul><li><input class="custom-control-input" type="radio" name="tree" id="Foo" value="Foo" checked=""><label class="custom-control-label" for="Foo">Foo</label></li></ul></form></div></div>
+    <div class="column left"><div id="input" class="tree-panel"><form class="tree" id="intputForm"><ul><li><span class="fixed"></span><span class="custom-control-input" id="Foo" style="font-weight:bold;font-size:18px">Foo</span></li></ul></form></div></div>
     <div class="column right"><div id="output"><svg>Component(Foo,"Foo","")\n</svg></div></div>
 </div>`,
     },
@@ -102,7 +102,7 @@ describe.each([
             route: "",
         },
         want: `<div class="row">
-    <div class="column left"><div id="input" class="ninotree custom-control custom-radio"><form class="tree" id="intputForm"><ul><li><i class="caret fas fa-caret-down"></i><input class="custom-control-input" type="radio" name="tree" id="Foo" value="Foo" checked=""><label class="custom-control-label" for="Foo">Foo</label><ul><li><i class="caret fas fa-caret-down"></i><input class="custom-control-input" type="radio" name="tree" id="Foo/Bar" value="Foo/Bar"><label class="custom-control-label" for="Foo/Bar">Bar</label><ul><li><input class="custom-control-input" type="radio" name="tree" id="Foo/Bar/Baz" value="Foo/Bar/Baz"><label class="custom-control-label" for="Foo/Bar/Baz">Baz</label></li></ul></li></ul></li></ul></form></div></div>
+    <div class="column left"><div id="input" class="tree-panel"><form class="tree" id="intputForm"><ul><li><span class="caret minimize"></span><span class="custom-control-input" id="Foo" style="font-weight:bold;font-size:18px">Foo</span><ul><li><span class="caret minimize"></span><span class="custom-control-input" id="Foo/Bar">Bar</span><ul><li><span class="fixed"></span><span class="custom-control-input" id="Foo/Bar/Baz">Baz</span></li></ul></li></ul></li></ul></form></div></div>
     <div class="column right"><div id="output"><svg>Component(Foo,"Foo","")\n</svg></div></div>
 </div>`,
     },
