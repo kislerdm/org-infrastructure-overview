@@ -29,6 +29,9 @@ export class C4DiagramBuilderMermaid implements DiagramBuilder {
                 },
                 startOnLoad: true,
                 htmlLabels: true,
+                c4: {
+                    diagramMarginY: 0,
+                }
             })
             this.client = mermaid;
         } else {
@@ -46,3 +49,4 @@ export class C4DiagramBuilderMermaid implements DiagramBuilder {
         return svg;
     }
 }
+
