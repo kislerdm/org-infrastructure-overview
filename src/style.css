@@ -26,10 +26,14 @@
 .column {
     float: left;
     padding: 10px;
+    border: #000 2px solid;
+    border-radius: 20px;
+    height: 90vh;
 }
 
 .left {
-    width: 30%;
+    width: 29%;
+    margin-right: 1%;
 }
 
 .right {
@@ -37,7 +41,6 @@
 }
 
 .row:after {
-    content: "";
     display: table;
     clear: both;
 }
@@ -45,6 +48,24 @@
 .tree-panel {
     margin: 0;
     padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: scroll;
+    float: right;
+}
+
+#input::-webkit-scrollbar {
+    width: 15px;
+}
+
+.force-overflow {
+    min-height: 800px;
+}
+
+#input::-webkit-scrollbar-thumb {
+    background: #7f7f7f;
+    border: 2px #000 solid;
+    border-radius: 5px;
 }
 
 .tree-panel ul {
@@ -79,4 +100,15 @@
 .fixed:before {
     content: "*";
     margin-right: 15px;
+}
+
+#output {
+    height: 90vh;
+    align-content: center;
+    margin: 0;
+    position: relative;
+}
+
+svg.diagram {
+    width: 100%;
 }

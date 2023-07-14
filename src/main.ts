@@ -55,7 +55,7 @@ export default async function Main(
         const svg = await builder.renderSVG(d.serialiseToPlantUML(id), mountPoint);
 
         mountPoint.innerHTML = `<div class="row">
-    <div class="column left"><div id="input" class="tree-panel">${Input(d.nodes, id)}</div></div>
+    <div class="column left"><div id="input" class="tree-panel"><div class="force-overflow">${Input(d.nodes, id)}</div></div></div>
     <div class="column right"><div id="output">${svg}</div></div>
 </div>`;
         // @ts-ignore
