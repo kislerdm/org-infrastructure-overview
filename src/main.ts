@@ -175,6 +175,7 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
 
             if (isMobileDevice()) {
                 hideInputPanel();
+                isClickedSelectorLabel = false;
             }
         })
     }
