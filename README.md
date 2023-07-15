@@ -153,38 +153,8 @@ Rel(team1.app, team0.app, "")
 Rel(team1.app, iam, "")
 ```
 
-## Data Structure
-[README.md](README.md)
-```go
-type graph struct {
-    Nodes []*Node `json:"nodes,omitempty"`
-    Links []*Link `json:"links,omitempty"`
-}
+## Demo
 
-type Node struct {
-    ID          string  `json:"id"`
-    Type        string  `json:"type"`
-    Description *string `json:"description,omitempty"`
-    Technology  *string `json:"technology,omitempty"`
-    Deployment  *string `json:"deployment,omitempty"`
-    Nodes       []*Node `json:"nodes,omitempty"`
-}
+The screenshot illustrates the tool in action by visualising the infrastructure defined in the [file](src/data.json). 
 
-type Link struct {
-    From        string  `json:"from"`
-    To          string  `json:"to"`
-    Description string  `json:"description"`
-    Technology  *string `json:"technology,omitempty"`
-}
-
-const (
-    TypeOrganisation = "organisation"
-    TypeDepartment   = "department"
-    TypeDomain       = "domain"
-    TypeTeam         = "team"
-    TypeSystem       = "service"
-    TypeApplication  = "application"
-    TypeDatabase     = "database"
-    TypeQueue        = "queue"
-)
-```
+![webui](webui-demo.png)
