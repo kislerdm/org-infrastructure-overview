@@ -1,5 +1,4 @@
-import './style.css';
-import Graph, {Node} from './graph.ts';
+import Graph, {Node} from "./graph.ts";
 import {DiagramBuilder} from "./diagram.ts";
 import SetTemplatedComponents from "./template.ts";
 
@@ -70,8 +69,12 @@ export class Router {
         if (lastChar != "?" && lastChar != "/") {
             return s;
         }
-        return this.removeTrailingCharacters(s.slice(0,-1));
+        return this.removeTrailingCharacters(s.slice(0, -1));
     }
+}
+
+function isMobileDevice(): boolean {
+    return window.screen.availWidth <= 1600
 }
 
 export default async function Main(mountPoint: HTMLDivElement, builder: DiagramBuilder, data: object): Promise<void> {
@@ -90,12 +93,13 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
     const route = router.readNodeIDFromRoute();
     const id: string = route !== "" ? route : d.nodes[0].id();
 
+    router.updateRouteToNode(id);
     try {
         // @ts-ignore
         const svg = await builder.renderSVG(d.serialiseToPlantUML(id), mountPoint);
 
         mountPoint.innerHTML = `<div class="row">
-    <div class="column left"><div id="input" class="tree-panel"><div class="force-overflow">${Input(d.nodes, id)}</div></div></div>
+    <div class="column left"><label id="lab-input" for="input">Select node</label><div id="input" class="tree-panel"><div class="force-overflow">${Input(d.nodes, id)}</div></div></div>
     <div class="column right"><div id="output">${svg}</div></div>
 </div>`;
         mountPoint.innerHTML = SetTemplatedComponents(mountPoint.innerHTML);
@@ -122,6 +126,20 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
     const inputElements = mountPoint
         .getElementsByClassName("custom-control-input");
 
+    const inputPanel = mountPoint.getElementsByClassName("column left")[0]!;
+
+    function showInputPanel() {
+        inputPanel.setAttribute("style", "height:70vh");
+        const inputTree = inputPanel.getElementsByClassName("tree-panel")[0]!;
+        inputTree.setAttribute("style", "width:100%")
+    }
+
+    function hideInputPanel() {
+        inputPanel.setAttribute("style", `height:6vh`);
+        const inputTree = inputPanel.getElementsByClassName("tree-panel")[0]!;
+        inputTree.setAttribute("style", "width:0")
+    }
+
     for (const elInput of inputElements) {
         elInput.addEventListener("click", async (e: Event): Promise<void> => {
             // @ts-ignore
@@ -146,6 +164,10 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
             // @ts-ignore
             elInput.setAttribute("style", inputSelectedIdStyle);
             prevSelectedId = id
+
+            if (isMobileDevice()) {
+                hideInputPanel();
+            }
         })
     }
 
@@ -159,6 +181,20 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
             caret.classList.toggle('minimize');
         });
     }
+
+    const selectorLabel = mountPoint.getElementsByTagName("label")[0]!;
+    let isClickedSelectorLabel: boolean = false;
+    selectorLabel.addEventListener("click", () => {
+        if (isMobileDevice()) {
+            if (isClickedSelectorLabel) {
+                hideInputPanel()
+                isClickedSelectorLabel = false;
+            } else {
+                showInputPanel();
+                isClickedSelectorLabel = true;
+            }
+        }
+    })
 }
 
 export function findFistDivElementByID(mountPoint: Element, id: string): Element | undefined {
