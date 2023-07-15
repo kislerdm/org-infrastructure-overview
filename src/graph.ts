@@ -291,7 +291,7 @@ function isValidLinkNodeID(id: string) {
     return isValidNodeIDRegexp.test(id)
 }
 
-function getNodeByID(nodes: Node[], id: string, root_id: string = ""): Node | undefined {
+export function getNodeByID(nodes: Node[], id: string, root_id: string = ""): Node | undefined {
     let id_flag = id.replace(root_id, "");
     if (id_flag.startsWith(nodeIDRouteSeparator)) {
         id_flag = id_flag.slice(1);

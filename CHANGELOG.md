@@ -3,6 +3,8 @@
 ### Added
 
 - Responsive design to optimise for mobile devices
+- Diagram titles
+- Improvement of design
 
 ## v0.0.1
 

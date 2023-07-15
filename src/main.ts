@@ -1,4 +1,4 @@
-import Graph, {Node} from "./graph.ts";
+import Graph, {getNodeByID, Node} from "./graph.ts";
 import {DiagramBuilder} from "./diagram.ts";
 import SetTemplatedComponents from "./template.ts";
 
@@ -77,6 +77,13 @@ function isMobileDevice(): boolean {
     return window.screen.availWidth <= 1600
 }
 
+function addTitle(node: Node | undefined): string {
+    if (node === undefined) {
+        return "";
+    }
+    return `<p id="diagram-title">Architecture diagram of the ${node.type} "${node.name}"</p>`
+}
+
 export default async function Main(mountPoint: HTMLDivElement, builder: DiagramBuilder, data: object): Promise<void> {
     let d: Graph;
     try {
@@ -100,7 +107,7 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
 
         mountPoint.innerHTML = `<div class="row">
     <div class="column left"><label id="lab-input" for="input">Select node</label><div id="input" class="tree-panel"><div class="force-overflow">${Input(d.nodes, id)}</div></div></div>
-    <div class="column right"><div id="output">${svg}</div></div>
+    <div class="column right"><div id="output">${addTitle(getNodeByID(d.nodes, id))}${svg}</div></div>
 </div>`;
         mountPoint.innerHTML = SetTemplatedComponents(mountPoint.innerHTML);
         // @ts-ignore
@@ -151,7 +158,8 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
                     mountPoint.getElementsByClassName("column right")[0]!, "output")!;
 
                 // @ts-ignore
-                el.innerHTML = await builder.renderSVG(d.serialiseToPlantUML(id), el);
+                const svg = await builder.renderSVG(d.serialiseToPlantUML(id), el);
+                el.innerHTML = `${addTitle(getNodeByID(d.nodes, id))}${svg}`
 
                 // @ts-ignore
             } catch (err: Error) {

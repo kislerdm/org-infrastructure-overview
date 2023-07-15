@@ -83,8 +83,8 @@ describe.each([
             route: "",
         },
         want: SetTemplatedComponents(`<div class="row">
-    <div class="column left"><div id="input" class="tree-panel"><div class="force-overflow"><form class="tree" id="intputForm"><ul><li><span class="fixed"></span><span class="custom-control-input" id="Foo" style="font-weight:bold;font-size:18px">Foo</span></li></ul></form></div></div></div>
-    <div class="column right"><div id="output"><svg>Component(Foo,"Foo","")\n</svg></div></div>
+    <div class="column left"><label id="lab-input" for="input">Select node</label><div id="input" class="tree-panel"><div class="force-overflow"><form class="tree" id="intputForm"><ul><li><span class="fixed"></span><span class="custom-control-input" id="Foo" style="font-weight:bold;font-size:18px">Foo</span></li></ul></form></div></div></div>
+    <div class="column right"><div id="output"><p id="diagram-title">Architecture diagram of the organisation "Foo"</p><svg>Component(Foo,"Foo","")\n</svg></div></div>
 </div>`),
     },
     {
@@ -114,8 +114,8 @@ describe.each([
             route: "",
         },
         want: SetTemplatedComponents(`<div class="row">
-    <div class="column left"><div id="input" class="tree-panel"><div class="force-overflow"><form class="tree" id="intputForm"><ul><li><span class="caret minimize"></span><span class="custom-control-input" id="Foo" style="font-weight:bold;font-size:18px">Foo</span><ul><li><span class="caret minimize"></span><span class="custom-control-input" id="Foo/Bar">Bar</span><ul><li><span class="fixed"></span><span class="custom-control-input" id="Foo/Bar/Baz">Baz</span></li></ul></li></ul></li></ul></form></div></div></div>
-    <div class="column right"><div id="output"><svg>Component(Foo,"Foo","")\n</svg></div></div>
+    <div class="column left"><label id="lab-input" for="input">Select node</label><div id="input" class="tree-panel"><div class="force-overflow"><form class="tree" id="intputForm"><ul><li><span class="caret minimize"></span><span class="custom-control-input" id="Foo" style="font-weight:bold;font-size:18px">Foo</span><ul><li><span class="caret minimize"></span><span class="custom-control-input" id="Foo/Bar">Bar</span><ul><li><span class="fixed"></span><span class="custom-control-input" id="Foo/Bar/Baz">Baz</span></li></ul></li></ul></li></ul></form></div></div></div>
+    <div class="column right"><div id="output"><p id="diagram-title">Architecture diagram of the organisation "Foo"</p><svg>Component(Foo,"Foo","")\n</svg></div></div>
 </div>`),
     },
     {

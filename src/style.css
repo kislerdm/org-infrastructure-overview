@@ -27,7 +27,7 @@
     float: left;
     border: #000 2px solid;
     border-radius: 20px;
-    height: 90vh;
+    height: 85vh;
     margin: 0 .25vw 0;
 }
 
@@ -70,6 +70,12 @@
 
     #input {
         width: 0;
+    }
+
+    p#diagram-title {
+        transform: translate(-50%, 50%);
+        font-size: 15pt;
+        text-align: center;
     }
 }
 
@@ -143,8 +149,8 @@ svg#diagram {
 }
 
 footer {
-    bottom: 0;
     text-align: center;
+    padding:1rem
 }
 
 a {
@@ -172,4 +178,12 @@ header {
     font-weight: bold;
     text-align: center;
     margin-bottom: 10px;
+}
+
+#diagram-title {
+    position: absolute;
+    font-size: 20pt;
+    text-align: center;
+    left: 50%;
+    transform: translate(0%, 50%);
 }
