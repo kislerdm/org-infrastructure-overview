@@ -3,6 +3,7 @@ import {beforeEach, describe, expect, it, test} from "vitest";
 import {JSDOM} from "jsdom";
 import Main, {findFistDivElementByID} from "../src/main";
 import {DiagramBuilder} from "../src/diagram";
+import SetTemplatedComponents from "../src/template";
 
 
 describe.each([
@@ -70,10 +71,10 @@ describe.each([
             builder: new mockDiagramBuilder(),
             route: "",
         },
-        want: `<div class="row">
-    <div class="column left"><div id="input" class="tree-panel"><form class="tree" id="intputForm"><ul><li><span class="fixed"></span><span class="custom-control-input" id="Foo" style="font-weight:bold;font-size:18px">Foo</span></li></ul></form></div></div>
+        want: SetTemplatedComponents(`<div class="row">
+    <div class="column left"><div id="input" class="tree-panel"><div class="force-overflow"><form class="tree" id="intputForm"><ul><li><span class="fixed"></span><span class="custom-control-input" id="Foo" style="font-weight:bold;font-size:18px">Foo</span></li></ul></form></div></div></div>
     <div class="column right"><div id="output"><svg>Component(Foo,"Foo","")\n</svg></div></div>
-</div>`,
+</div>`),
     },
     {
         input: {
@@ -101,10 +102,10 @@ describe.each([
             builder: new mockDiagramBuilder(),
             route: "",
         },
-        want: `<div class="row">
-    <div class="column left"><div id="input" class="tree-panel"><form class="tree" id="intputForm"><ul><li><span class="caret minimize"></span><span class="custom-control-input" id="Foo" style="font-weight:bold;font-size:18px">Foo</span><ul><li><span class="caret minimize"></span><span class="custom-control-input" id="Foo/Bar">Bar</span><ul><li><span class="fixed"></span><span class="custom-control-input" id="Foo/Bar/Baz">Baz</span></li></ul></li></ul></li></ul></form></div></div>
+        want: SetTemplatedComponents(`<div class="row">
+    <div class="column left"><div id="input" class="tree-panel"><div class="force-overflow"><form class="tree" id="intputForm"><ul><li><span class="caret minimize"></span><span class="custom-control-input" id="Foo" style="font-weight:bold;font-size:18px">Foo</span><ul><li><span class="caret minimize"></span><span class="custom-control-input" id="Foo/Bar">Bar</span><ul><li><span class="fixed"></span><span class="custom-control-input" id="Foo/Bar/Baz">Baz</span></li></ul></li></ul></li></ul></form></div></div></div>
     <div class="column right"><div id="output"><svg>Component(Foo,"Foo","")\n</svg></div></div>
-</div>`,
+</div>`),
     },
     {
         input: {
@@ -119,7 +120,7 @@ describe.each([
             builder: new mockDiagramBuilder(),
             route: "",
         },
-        want: `<div class="alert">Error<div style="color:#000">Invalid value for key "name" on Node. Expected string but got undefined</div></div>`,
+        want: SetTemplatedComponents(`<div class="alert">Error<div style="color:#000">Invalid value for key "name" on Node. Expected string but got undefined</div></div>`),
     },
     {
         input: {
@@ -135,7 +136,7 @@ describe.each([
             builder: new mockDiagramBuilder(new Error("foo")),
             route: "",
         },
-        want: `<div class="alert">Error<div style="color:#000">Diagram rendering error. Node ID: Foo\nfoo</div></div>`,
+        want: SetTemplatedComponents(`<div class="alert">Error<div style="color:#000">Diagram rendering error. Node ID: Foo\nfoo</div></div>`),
     }
 ])("Main: $input.name", async function ({input, want}) {
     let mountPoint: HTMLDivElement;

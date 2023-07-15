@@ -1,6 +1,7 @@
 import './style.css';
 import Graph, {Node} from './graph.ts';
 import {DiagramBuilder} from "./diagram.ts";
+import SetTemplatedComponents from "./template.ts";
 
 const inputSelectedIdStyle: string = "font-weight:bold;font-size:18px";
 
@@ -45,6 +46,7 @@ export default async function Main(
     } catch (err: Error) {
         console.error(err.message);
         mountPoint.innerHTML = errorMessage(err.message);
+        mountPoint.innerHTML = SetTemplatedComponents(mountPoint.innerHTML);
         return;
     }
 
@@ -58,10 +60,12 @@ export default async function Main(
     <div class="column left"><div id="input" class="tree-panel"><div class="force-overflow">${Input(d.nodes, id)}</div></div></div>
     <div class="column right"><div id="output">${svg}</div></div>
 </div>`;
+        mountPoint.innerHTML = SetTemplatedComponents(mountPoint.innerHTML);
         // @ts-ignore
     } catch (err: Error) {
         console.error(err.message);
         mountPoint.innerHTML = errorMessage(`Diagram rendering error. Node ID: ${id}\n${err.message}`);
+        mountPoint.innerHTML = SetTemplatedComponents(mountPoint.innerHTML);
         return;
     }
 
@@ -95,6 +99,7 @@ export default async function Main(
             } catch (err: Error) {
                 console.error(err.message);
                 mountPoint.innerHTML = errorMessage(`Diagram rendering error. Node ID: ${id}\n${err.message}`);
+                mountPoint.innerHTML = SetTemplatedComponents(mountPoint.innerHTML);
             }
 
             resetDefaultStyleInputElement(prevSelectedId);
