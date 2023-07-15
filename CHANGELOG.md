@@ -1,3 +1,9 @@
+## v0.0.2
+
+### Added
+
+- Responsive design to optimise for mobile devices
+
 ## v0.0.1
 
 ### Added
