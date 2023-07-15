@@ -1,3 +1,13 @@
+## v0.0.3
+
+### Added
+
+- "About" section as the info popup
+
+### Fixed
+
+- The state handling to maximise the input tree selector for mobile devices
+
 ## v0.0.2
 
 ### Added
