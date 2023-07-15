@@ -36,21 +36,45 @@ function errorMessage(msg: string): string {
     return `<div class="alert">Error<div style="color:#000">${msg}</div>`;
 }
 
-class Router {
-    readonly history: History
+export class Router {
+    private readonly history: History
+    private readonly location: Location;
+    private readonly base: string;
 
-    constructor() {
-        this.history = window.history
+    private token: string = "q";
+
+    constructor(location: Location) {
+        this.location = location;
+        this.history = window.history;
+        this.base = this.removeTrailingCharacters(this.split()[0]);
     }
 
     updateRouteToNode(nodeID: string) {
-        this.history.pushState({}, "", `${window.location.origin}/${nodeID}`)
+        this.history.pushState({}, "", `${this.base}?${this.token}=${nodeID}`)
+    }
+
+    readNodeIDFromRoute(): string {
+        const spl = this.split();
+        if (spl.length < 2) {
+            return "";
+        }
+        return spl[1];
+    }
+
+    private split(): string[] {
+        return this.location.href.split(`${this.token}=`);
+    }
+
+    private removeTrailingCharacters(s: string): string {
+        const lastChar = s.slice(-1);
+        if (lastChar != "?" && lastChar != "/") {
+            return s;
+        }
+        return this.removeTrailingCharacters(s.slice(0,-1));
     }
 }
 
-export default async function Main(
-    mountPoint: HTMLDivElement, builder: DiagramBuilder, route: string, data: object
-): Promise<void> {
+export default async function Main(mountPoint: HTMLDivElement, builder: DiagramBuilder, data: object): Promise<void> {
     let d: Graph;
     try {
         d = new Graph(data);
@@ -62,8 +86,8 @@ export default async function Main(
         return;
     }
 
-    const routeState = new Router();
-
+    const router = new Router(window.location);
+    const route = router.readNodeIDFromRoute();
     const id: string = route !== "" ? route : d.nodes[0].id();
 
     try {
@@ -103,7 +127,7 @@ export default async function Main(
             // @ts-ignore
             const id = e.target!.id
             try {
-                routeState.updateRouteToNode(id)
+                router.updateRouteToNode(id)
 
                 const el = findFistDivElementByID(
                     mountPoint.getElementsByClassName("column right")[0]!, "output")!;
