@@ -3,6 +3,18 @@
 The tool to facilitate understanding of complex systems using C4 model diagrams with dynamically-adjustable
 level of details.
 
+* [Demo](#demo)
+* [Transitions](#transitions)
+  + [Example](#example)
+    - [Test Scenario - Domain Level](#test-scenario---domain-level)
+    - [Test Scenario - Container Level](#test-scenario---container-level)
+
+## Demo
+
+The screenshot illustrates the tool in action by visualising the infrastructure defined in the [file](src/data.json).
+
+![webui](webui-demo.png)
+
 ## Transitions
 
 The contextual topology is illustrated below.
@@ -152,9 +164,3 @@ Enterprise_Boundary(team4, "Team 4") {
 Rel(team1.app, team0.app, "")
 Rel(team1.app, iam, "")
 ```
-
-## Demo
-
-The screenshot illustrates the tool in action by visualising the infrastructure defined in the [file](src/data.json). 
-
-![webui](webui-demo.png)
