@@ -36,6 +36,18 @@ function errorMessage(msg: string): string {
     return `<div class="alert">Error<div style="color:#000">${msg}</div>`;
 }
 
+class Router {
+    readonly history: History
+
+    constructor() {
+        this.history = window.history
+    }
+
+    updateRouteToNode(nodeID: string) {
+        this.history.pushState({}, "", `${window.location.origin}/${nodeID}`)
+    }
+}
+
 export default async function Main(
     mountPoint: HTMLDivElement, builder: DiagramBuilder, route: string, data: object
 ): Promise<void> {
@@ -49,6 +61,8 @@ export default async function Main(
         mountPoint.innerHTML = SetTemplatedComponents(mountPoint.innerHTML);
         return;
     }
+
+    const routeState = new Router();
 
     const id: string = route !== "" ? route : d.nodes[0].id();
 
@@ -89,6 +103,8 @@ export default async function Main(
             // @ts-ignore
             const id = e.target!.id
             try {
+                routeState.updateRouteToNode(id)
+
                 const el = findFistDivElementByID(
                     mountPoint.getElementsByClassName("column right")[0]!, "output")!;
 

@@ -3,7 +3,7 @@ function Footer(): string {
 }
 
 function Header(): string {
-    return `<header>Organisational Infrastructure Diagrams</header>`
+    return `<header>Organisational Infrastructure's Diagrams</header>`
 }
 
 export default function SetTemplatedComponents(baseHTML: string): string {
