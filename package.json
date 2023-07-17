@@ -1,6 +1,6 @@
 {
-  "name": "dynamic-c4diagram",
-  "version": "0.0.1",
+  "name": "org-infrastructure-overview",
+  "version": "0.0.3",
   "type": "module",
   "scripts": {
     "testlive": "vitest --live",
