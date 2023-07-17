@@ -150,7 +150,7 @@ svg#diagram {
 
 footer {
     text-align: center;
-    padding:1rem
+    padding: 1rem
 }
 
 a {
@@ -186,4 +186,49 @@ header {
     text-align: center;
     left: 50%;
     transform: translate(0%, 50%);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: var(--code-bg);
+    margin: 15% auto;
+    padding: 20px;
+    border: 2px solid #000;
+    border-radius: 20px;
+    width: 80vh;
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: relative;
+    top: 0;
+    right: 0;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+p#info {
+    text-align: left;
 }

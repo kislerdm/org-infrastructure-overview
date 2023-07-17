@@ -1,6 +1,7 @@
 import Graph, {getNodeByID, Node} from "./graph.ts";
 import {DiagramBuilder} from "./diagram.ts";
-import SetTemplatedComponents from "./template.ts";
+import SetTemplatedComponents, {addInfoPopUp} from "./template.ts";
+
 
 const inputSelectedIdStyle: string = "font-weight:bold;font-size:18px";
 
@@ -93,6 +94,7 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
         console.error(err.message);
         mountPoint.innerHTML = errorMessage(err.message);
         mountPoint.innerHTML = SetTemplatedComponents(mountPoint.innerHTML);
+        addInfoPopUp(mountPoint)
         return;
     }
 
@@ -110,11 +112,13 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
     <div class="column right"><div id="output">${addTitle(getNodeByID(d.nodes, id))}${svg}</div></div>
 </div>`;
         mountPoint.innerHTML = SetTemplatedComponents(mountPoint.innerHTML);
+        addInfoPopUp(mountPoint)
         // @ts-ignore
     } catch (err: Error) {
         console.error(err.message);
         mountPoint.innerHTML = errorMessage(`Diagram rendering error. Node ID: ${id}\n${err.message}`);
         mountPoint.innerHTML = SetTemplatedComponents(mountPoint.innerHTML);
+        addInfoPopUp(mountPoint)
         return;
     }
 
@@ -166,6 +170,7 @@ export default async function Main(mountPoint: HTMLDivElement, builder: DiagramB
                 console.error(err.message);
                 mountPoint.innerHTML = errorMessage(`Diagram rendering error. Node ID: ${id}\n${err.message}`);
                 mountPoint.innerHTML = SetTemplatedComponents(mountPoint.innerHTML);
+                addInfoPopUp(mountPoint)
             }
 
             resetDefaultStyleInputElement(prevSelectedId);
