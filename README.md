@@ -1,53 +1,30 @@
-# Organisation infrastructure's architecture overview with dynamically-adjustable level of details
+# `org-infrastructure-overview`: organisation infrastructure's architecture overview with dynamically-adjustable level of details
 
-The tool to facilitate understanding of complex systems across (sub-)organisations using C4 model diagrams with
-dynamically-adjustable level of details.
+`org-infrastructure-overview` is the tool aiming to facilitate understanding dependencies between complex systems
+across (sub-)organisations using [C4 model](https://c4model.com/) diagrams with dynamically-adjustable level of details.
+It illustrates inter-domains interactions spanning several teams and services based on their definition as
+the [graph](graph-schema.json).
+
+## Contents
 
 * [Demo](#demo)
-* [Transitions](#transitions)
-    + [Example](#example)
-        - [Test Scenario - Domain Level](#test-scenario---domain-level)
-        - [Test Scenario - Container Level](#test-scenario---container-level)
+* [How to run](#how-to-run)
+    + [Prerequisites](#prerequisites)
+    + [Commands](#commands)
+* [How to define graph](#how-to-define-graph)
+* [Contribution](#contribution)
+  + [Further development](#further-development)
 
 ## Demo
 
 The screenshot illustrates the tool in action by visualising the infrastructure defined in the [file](src/data.json).
 
-![webui](webui-demo.png)
+<img src="webui-demo.png" alt="webui" height=400 style="border:#000 solid 1px">
 
-## Transitions
+<details>
+<summary><strong>Demo topology</strong></summary>
 
-The contextual topology is illustrated below.
-
-```commandline
-organisation
-|-- department 0
-|   |-- domain 0.0
-|   |   |-- team 0.0.0
-|   |   |   |-- system 0.0.0
-|   |   |   |   |-- container 0.0.0
-|   |   |   |   |-- container 0.0.1
-|   |   |   |   |   ...
-|   |   |   |   `-- container 0.0.P
-|   |   |   |-- system 0.0.1
-|   |   |   |   ...
-|   |   |   `-- system 0.0.L
-|   |   |-- team 0.0.1
-|   |   |   ...
-|   |   `-- team 0.0.K
-|   |-- domain 0.1
-|   |   ...
-|   `-- domain 0.M
-|-- department 1
-|   ...
-`-- department N
-```
-
-The context transitions from the _organisation_ level down to the _system_ level. The diagram of every level includes
-the
-nodes which belong to selected level's node and the linked nodes from other levels.
-
-### Example
+The demo application is based on the demo org structure topology described below.
 
 **GIVEN**
 
@@ -90,78 +67,210 @@ nodes which belong to selected level's node and the linked nodes from other leve
     - _l2_: Go application deployed as AWS Lambda for AWS Cognito trigger 3;
 - _Service9_ is AWS SES used as the email notification service.
 
+**Note** that the above description is stored as the [graph definition](src/data.json) for the tool.
+
 #### Test Scenario - Domain Level
 
 **WHEN**
 
-- _Domain_ context level is set
-- _DomainA_ is selected
+_DomainA_ is selected
 
 **THEN**
 
 The following diagram is expected.
 
 ```mermaid 
-C4Context
-
-    Enterprise_Boundary(foo, "Organisation Foo") {
-        Enterprise_Boundary(departmentA, "Department A") {
-            Enterprise_Boundary(domainA, "Domain A") {
-                Component(team0, "Team 0")
-                Component(team1, "Team 1")
-            }
-        }
-        Enterprise_Boundary(departmentB, "Department B") {
-            Component_Ext(team3, "Team 3")
-            Component_Ext(team4, "Team 4")
-        }
+C4Container
+    Enterprise_Boundary(Foo/DepartmentA, "Department A") {
+        Component(Foo/DepartmentA/DomainA, "DomainA")
     }
-    Rel(team1, team0, "")
-    Rel(team0, team4, "")
-    Rel(team0, team3, "")
-    Rel(team1, team4, "")
-```
-
-```mermaid
-C4Context
-    Enterprise_Boundary(Foo.DepartmentA, "DepartmentA") {
-        Enterprise_Boundary(Foo.DepartmentA.DomainA, "DomainA") {
-            Component(Foo.DepartmentA.DomainA.Team0, "Team0")
-            Component_Ext(Foo.DepartmentA.DomainA.Team1, "Team1")
-        }
-    }
-    Enterprise_Boundary(Foo.DepartmentB, "DepartmentB") {
-        Component_Ext(Foo.DepartmentB.Team3, "Team3")
-        Component_Ext(Foo.DepartmentB.Team4, "Team4")
-    }
-    Rel(Foo.DepartmentA.DomainA.Team0, Foo.DepartmentB.Team3, "")
-    Rel(Foo.DepartmentA.DomainA.Team0, Foo.DepartmentB.Team4, "")
-    Rel(Foo.DepartmentA.DomainA.Team1, Foo.DepartmentA.DomainA.Team0, "")
 ```
 
 #### Test Scenario - Container Level
 
 **WHEN**
 
-- _Application_ context level is set
-- _WebClient Application_ is selected
+_Service2_ is selected
 
 **THEN**
 
 The following diagram is expected.
 
 ```mermaid
-C4Context
-
-    Enterprise_Boundary(team1, "Team 1") {
-        Container(team1.app, "WebClient", "JavaScript/AWS EKS")
+C4Container
+    Enterprise_Boundary(Foo/DepartmentA/DomainA/Team1, "Team1") {
+        Container(Foo/DepartmentA/DomainA/Team1/Service2, "Service2", "JavaScript/AWS EKS", "web application used by clients")
     }
-    Enterprise_Boundary(team0, "Team 0") {
-        Container_Ext(team0.app, "Backend", "Kotlin/AWS EKS")
+    Enterprise_Boundary(Foo/DepartmentA/DomainA/Team0, "Team0") {
+        System_Ext(Foo/DepartmentA/DomainA/Team0/Service0, "Service0")
     }
-    Enterprise_Boundary(team4, "Team 4") {
-        Container_Ext(iam, "CIAM", "AWS Cognito")
+    Enterprise_Boundary(Foo/DepartmentB/Team4, "Team4") {
+        System_Ext(Foo/DepartmentB/Team4/Service8, "Service8", "", "IAM")
     }
-    Rel(team1.app, team0.app, "")
-    Rel(team1.app, iam, "")
+    Rel(Foo/DepartmentA/DomainA/Team1/Service2, Foo/DepartmentA/DomainA/Team0/Service0, "Uses to process user's requests", "sync, HTTP/JSON")
+    Rel(Foo/DepartmentA/DomainA/Team1/Service2, Foo/DepartmentB/Team4/Service8, "Authenticates users", "sync, HTTP/JSON")
 ```
+
+</details>
+
+## How to run
+
+### Prerequisites
+
+- Node.js v18.16+
+
+### Commands
+
+Run to setup:
+
+```commandline
+npm install
+```
+
+Run to test:
+
+```commandline
+npm run test
+```
+
+Run to launch a dev server:
+
+```commandline
+npm run dev
+```
+
+Run to build:
+
+```commandline
+npm run build
+```
+
+## How to define graph
+
+**The graph definition rules**:
+
+- The graph must be defined according to the [JSON schema](graph-schema.json).
+- Each element in the graph is referred to as a `node`.
+- Dependencies between nodes are defined by `links`.
+- Every `link` represents a dependency, not data flow. The attribute **_from_** denotes the ID of the node
+  dependent on the `node` denoted by the attribute **_to_**.
+- The `node` ID is defined as a Unix path, which includes the IDs of the node's parent and the parent of its parent
+  and so on recursively.
+- The `node` ID is defined by using the names of the node and its parents. All special characters and spaces are
+  removed, and the results are concatenated using the forward slash sign (`/`) as the separator.
+
+<details>
+<summary><strong>The contextual topology</strong></summary>
+
+```commandline
+organisation 0
+|-- department 0/0
+|   |-- domain 0/0/0
+|   |   |-- team 0/0/0/0
+|   |   |   |-- service 0/0/0/0/0
+|   |   |   |   |-- application 0/0/0/0/0/0
+|   |   |   |   |-- application 0/0/0/0/0/1
+|   |   |   |   |   ...
+|   |   |   |   |-- queue 0/0/0/0/0/2
+|   |   |   |   `-- database 0/0/0/0/0/P
+|   |   |   |-- service 0/0/0/0/1
+|   |   |   |   ...
+|   |   |   `-- service 0/0/0/0/L
+|   |   |-- team 0/0/0/1
+|   |   |   `-- application 0/0/0/1/0
+|   |   |   ...
+|   |   `-- team 0/0/0/K
+|   |-- domain 0/1
+|   |   ...
+|   |-- domain 0/X
+|   |   `-- application 0/X/0
+|   |   ...
+|   `-- domain 0/M
+|-- department 0/1
+|   ...
+|-- team 0/R
+|   ...
+|-- department 0/Y
+|   `-- database 0/Y/0
+|   ...
+|-- department 0/Z
+|   `-- team 0/Z/0
+|   ...
+`-- department 0/N
+```
+
+The context transitions from the _organisation_ level down to the _system_ level. The diagram of every level includes
+the nodes which belong to selected level's node and the linked nodes from other levels.
+
+</details>
+
+<details>
+<summary><strong>Graph definition example</strong></summary>
+
+**GIVEN**
+
+- Two business domains _DomainA_ and _DomainB_ belong to the same business unit _Unit0_;
+- _DomainA_ updates the entity based on the domain events emitted by the _DomainB_;
+- Both domains communicate via the _Platform0_ by publishing and consuming domain events.
+
+**WHEN**
+
+The given topology is intended to be illustrated using the `org-infrastructure-overview` tool.
+
+**THEN**
+
+The following graph shall be expected:
+
+```json
+{
+  "nodes": [
+    {
+      "name": "Unit0",
+      "type": "department",
+      "nodes": [
+        {
+          "name": "DomainA",
+          "type": "domain"
+        },
+        {
+          "name": "DomainB",
+          "type": "domain"
+        }
+      ]
+    },
+    {
+      "name": "Platform0",
+      "type": "service"
+    }
+  ],
+  "links": [
+    {
+      "from": "Unit0/DomainA",
+      "to": "Unit0/DomainB",
+      "description": "Uses to update the entity state"
+    },
+    {
+      "from": "Unit0/DomainA",
+      "to": "Platform0",
+      "description": "Publishes and consumes domain events"
+    },
+    {
+      "from": "Unit0/DomainB",
+      "to": "Platform0",
+      "description": "Publishes and consumes domain events"
+    }
+  ]
+}
+```
+
+</details>
+
+## Contribution
+
+The codebase is distributes under the MIT license. Please feel free to open PR, or issue with your request.
+
+### Further development
+
+Given that the organisations which would benefit from the tool use [spotify backstage](https://backstage.io/),
+or [opslevel](https://www.opslevel.com/), it would make sense to integrate the tool's logic as plugins to the mentioned
+systems.
