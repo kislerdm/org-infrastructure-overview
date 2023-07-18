@@ -1,3 +1,10 @@
+## v0.0.4
+
+### Fixed
+
+- Info "about button" location to accommodate for mobile clients
+- About model width to accommodate for mobile clients
+
 ## v0.0.3
 
 ### Added
