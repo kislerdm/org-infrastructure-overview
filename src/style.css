@@ -208,7 +208,7 @@ header {
     padding: 20px;
     border: 2px solid #000;
     border-radius: 20px;
-    width: 80vh;
+    width: 90vh;
 }
 
 /* The Close Button */
@@ -229,6 +229,13 @@ header {
     cursor: pointer;
 }
 
-p#info {
+p.info,
+ul.info {
     text-align: left;
+    font-size: 1rem;
+    font-weight: 300;
+}
+
+ul.info {
+    list-style-type: decimal;
 }

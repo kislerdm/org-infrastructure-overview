@@ -3,7 +3,7 @@ import {beforeEach, describe, expect, it, test} from "vitest";
 import {JSDOM} from "jsdom";
 import Main, {findFistDivElementByID, Router} from "../src/main";
 import {DiagramBuilder} from "../src/diagram";
-import SetTemplatedComponents from "../src/template";
+import SetTemplatedComponents, {addInfoPopUp} from "../src/template";
 
 describe.each([
     {url: "https://foobar.com/baz-qux/", want: ""},
@@ -159,6 +159,7 @@ describe.each([
 
     test(`shall generate the html page ${want}`, async () => {
         await Main(mountPoint, input.builder, input.data);
+
         expect(mountPoint.innerHTML).toEqual(want);
     })
 })
