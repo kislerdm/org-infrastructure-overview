@@ -203,8 +203,7 @@ class node {
                     }
                 }
 
-                // TODO: remove the condition when the https://github.com/mermaid-js/mermaid/issues/4576 is resolved
-                if (this.type == Type.Queue && externalPrefix != "") {
+                if (externalPrefix != "") {
                     return `Container${externalPrefix}(${this._id},"${this.name}","${tech}","${this.description}")`;
                 }
 

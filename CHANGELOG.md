@@ -1,3 +1,10 @@
+## v0.0.5
+
+### Added
+
+- Fixed support of external queue after new [release](https://github.com/mermaid-js/mermaid/releases/tag/v10.3.0) of
+  mermaid
+
 ## v0.0.4
 
 ### Fixed
